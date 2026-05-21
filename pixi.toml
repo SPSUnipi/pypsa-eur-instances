@@ -81,7 +81,6 @@ pre-commit = ">=4.3.0"
 proj = ">=9.6.2"
 pylint = ">=4.0.2"
 pydeck = ">0.6"  # pypsa fails to import with pydeck <0.6, lower bound was only added from pypsa 1.0.6
-pypsa = ">=0.35.2"
 pyscipopt = ">=5.6.0"
 pytables = ">=3.10.2"
 python = ">=3.10"
@@ -177,3 +176,6 @@ pytest = ">=8.4.2"
 [environments]
 doc = { features = ["doc"], no-default-feature = true }
 test = ["test"]
+
+[pypi-dependencies]
+pypsa = { git = "https://github.com/AlessandroPampado99/PyPSA.git", branch = "smspp_optimize" }
