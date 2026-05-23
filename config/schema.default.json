@@ -186,7 +186,7 @@
         },
         "plot_availability_matrix": {
           "default": false,
-          "description": "Whether to plot the landuse availability matrix.",
+          "description": "Whether to plot the landuse availability matrix. Warning: This requires a significant amount of memory and time and may crash for larger workflows. Use with caution.",
           "type": "boolean"
         },
         "cutouts": {
@@ -628,7 +628,7 @@
                 }
               ],
               "default": false,
-              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_network`. **Warning:** This option should currently only be used with electricity-only networks, not for sector-coupled networks."
+              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_network`, use `nseg` for temporal segmentation, or use `ncx` (e.g. `12c24`) to select `n` equally spaced chunks of `x` snapshots per year. **Warning:** This option should currently only be used with electricity-only networks, not for sector-coupled networks."
             },
             "resolution_sector": {
               "anyOf": [
@@ -640,7 +640,7 @@
                 }
               ],
               "default": false,
-              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_sector_network`."
+              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_sector_network`, use `nsn` for representative snapshots, use `nseg` for temporal segmentation, or use `ncx` (e.g. `12c24`) to select `n` equally spaced chunks of `x` snapshots per year."
             }
           }
         }
@@ -4878,6 +4878,13 @@
               "description": "H2 pipeline transmission efficiency.",
               "type": "object"
             },
+            "H2 pipeline retrofitted": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "description": "H2 pipeline retrofitted transmission efficiency.",
+              "type": "object"
+            },
             "gas pipeline": {
               "additionalProperties": {
                 "type": "number"
@@ -8055,7 +8062,7 @@
             }
           ],
           "default": false,
-          "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_network`. **Warning:** This option should currently only be used with electricity-only networks, not for sector-coupled networks."
+          "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_network`, use `nseg` for temporal segmentation, or use `ncx` (e.g. `12c24`) to select `n` equally spaced chunks of `x` snapshots per year. **Warning:** This option should currently only be used with electricity-only networks, not for sector-coupled networks."
         },
         "resolution_sector": {
           "anyOf": [
@@ -8067,7 +8074,7 @@
             }
           ],
           "default": false,
-          "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_sector_network`."
+          "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_sector_network`, use `nsn` for representative snapshots, use `nseg` for temporal segmentation, or use `ncx` (e.g. `12c24`) to select `n` equally spaced chunks of `x` snapshots per year."
         }
       }
     },
@@ -8093,6 +8100,13 @@
             "type": "number"
           },
           "description": "H2 pipeline transmission efficiency.",
+          "type": "object"
+        },
+        "H2 pipeline retrofitted": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "H2 pipeline retrofitted transmission efficiency.",
           "type": "object"
         },
         "gas pipeline": {
@@ -8803,7 +8817,7 @@
         },
         "plot_availability_matrix": {
           "default": false,
-          "description": "Whether to plot the landuse availability matrix.",
+          "description": "Whether to plot the landuse availability matrix. Warning: This requires a significant amount of memory and time and may crash for larger workflows. Use with caution.",
           "type": "boolean"
         },
         "cutouts": {
@@ -11327,6 +11341,13 @@
               "description": "H2 pipeline transmission efficiency.",
               "type": "object"
             },
+            "H2 pipeline retrofitted": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "description": "H2 pipeline retrofitted transmission efficiency.",
+              "type": "object"
+            },
             "gas pipeline": {
               "additionalProperties": {
                 "type": "number"
@@ -12075,7 +12096,7 @@
                 }
               ],
               "default": false,
-              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_network`. **Warning:** This option should currently only be used with electricity-only networks, not for sector-coupled networks."
+              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_network`, use `nseg` for temporal segmentation, or use `ncx` (e.g. `12c24`) to select `n` equally spaced chunks of `x` snapshots per year. **Warning:** This option should currently only be used with electricity-only networks, not for sector-coupled networks."
             },
             "resolution_sector": {
               "anyOf": [
@@ -12087,7 +12108,7 @@
                 }
               ],
               "default": false,
-              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_sector_network`."
+              "description": "Resample the time-resolution by averaging over every `n` snapshots in `prepare_sector_network`, use `nsn` for representative snapshots, use `nseg` for temporal segmentation, or use `ncx` (e.g. `12c24`) to select `n` equally spaced chunks of `x` snapshots per year."
             }
           }
         }
