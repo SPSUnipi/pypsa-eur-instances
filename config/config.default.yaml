@@ -1273,14 +1273,15 @@ solving:
     "cbc-default": {}
     "glpk-default": {}
     "smspp-ucblock":
-      capacity_expansion_ucblock: true  # enable ucblock (default value)
+      capacity_expansion_ucblock: true
     "smspp-investmentblock":
-      capacity_expansion_ucblock: false  # enable investmentblock
+      capacity_expansion_ucblock: false
     "smspp-stochastic":
-      stochastic_type: tssb
-      parameters:
-        - "demand"
-        - "renewables"
+      stochastic_parameters:
+        stochastic_type: tssb
+        parameters:
+        - demand
+        - renewables
   check_objective:
     enable: false
     expected_value:
