@@ -31,6 +31,33 @@ INDEX_COLS = {
     "metrics": 1,
 }
 
+
+def solver_labels(solver_config: dict) -> list[str]:
+    names = solver_config["name"]
+    names = names if isinstance(names, list) else [names]
+
+    name_counts = {name: names.count(name) for name in set(names)}
+    occurrences = {}
+    labels = set()
+    result = []
+    for name in names:
+        occurrences[name] = occurrences.get(name, 0) + 1
+        label = name
+        if name_counts[name] > 1 and occurrences[name] > 1:
+            label = f"{name}_{occurrences[name]}"
+
+        original_label = label
+        suffix = 2
+        while label in labels:
+            label = f"{original_label}_{suffix}"
+            suffix += 1
+
+        labels.add(label)
+        result.append(label)
+
+    return result
+
+
 if __name__ == "__main__":
     if "snakemake" not in globals():
         from scripts._helpers import mock_snakemake
@@ -43,19 +70,23 @@ if __name__ == "__main__":
     for kind in snakemake.output.keys():
         logger.info(f"Creating global summary for {kind}")
 
+        solvers = list(getattr(snakemake.params, "solvers", [])) or solver_labels(
+            snakemake.config["solving"]["solver"]
+        )
         summaries_dict = {
-            (cluster, opt + sector_opt, planning_horizon): "results/"
+            (cluster, opt + sector_opt, planning_horizon, solver): "results/"
             + snakemake.params.RDIR
-            + f"csvs/individual/{kind}_s_{cluster}_{opt}_{sector_opt}_{planning_horizon}.csv"
+            + f"csvs/individual/{kind}_s_{cluster}_{opt}_{sector_opt}_{planning_horizon}_{solver}.csv"
             for cluster in snakemake.params.scenario["clusters"]
             for opt in snakemake.params.scenario["opts"]
             for sector_opt in snakemake.params.scenario["sector_opts"]
             for planning_horizon in snakemake.params.scenario["planning_horizons"]
+            for solver in solvers
         }
 
         columns = pd.MultiIndex.from_tuples(
             summaries_dict.keys(),
-            names=["cluster", "opt", "planning_horizon"],
+            names=["cluster", "opt", "planning_horizon", "solver"],
         )
 
         summaries = []

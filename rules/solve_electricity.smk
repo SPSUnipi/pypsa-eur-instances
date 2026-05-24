@@ -7,21 +7,23 @@ rule solve_network:
     input:
         network=resources("networks/base_s_{clusters}_elec_{opts}.nc"),
     output:
-        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}.nc",
-        config=RESULTS + "configs/config.base_s_{clusters}_elec_{opts}.yaml",
+        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
+        config=RESULTS + "configs/config.base_s_{clusters}_elec_{opts}_{solver}.yaml",
         model=(
-            RESULTS + "models/base_s_{clusters}_elec_{opts}.nc"
+            RESULTS + "models/base_s_{clusters}_elec_{opts}_{solver}.nc"
             if config["solving"]["options"]["store_model"]
             else []
         ),
     log:
         solver=normpath(
-            RESULTS + "logs/solve_network/base_s_{clusters}_elec_{opts}_solver.log"
+            RESULTS + "logs/solve_network/base_s_{clusters}_elec_{opts}_{solver}_solver.log"
         ),
-        memory=RESULTS + "logs/solve_network/base_s_{clusters}_elec_{opts}_memory.log",
-        python=RESULTS + "logs/solve_network/base_s_{clusters}_elec_{opts}_python.log",
+        memory=RESULTS
+        + "logs/solve_network/base_s_{clusters}_elec_{opts}_{solver}_memory.log",
+        python=RESULTS
+        + "logs/solve_network/base_s_{clusters}_elec_{opts}_{solver}_python.log",
     benchmark:
-        (RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}")
+        (RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}")
     shadow:
         shadow_config
     threads: solver_threads
@@ -29,32 +31,35 @@ rule solve_network:
         mem_mb=memory,
         runtime=config_provider("solving", "runtime", default="6h"),
     params:
-        solving=config_provider("solving"),
+        solving=solving_for_solver,
         foresight=config_provider("foresight"),
         co2_sequestration_potential=config_provider(
             "sector", "co2_sequestration_potential", default=200
         ),
         custom_extra_functionality=input_custom_extra_functionality,
     message:
-        "Solving electricity network optimization for {wildcards.clusters} clusters and {wildcards.opts} electric options"
+        "Solving electricity network optimization with {wildcards.solver} for {wildcards.clusters} clusters and {wildcards.opts} electric options"
     script:
         scripts("solve_network.py")
 
 
 rule solve_operations_network:
     input:
-        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}.nc",
+        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
     output:
-        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_op.nc",
+        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}_op.nc",
     log:
         solver=normpath(
             RESULTS
-            + "logs/solve_operations_network/base_s_{clusters}_elec_{opts}_op_solver.log"
+            + "logs/solve_operations_network/base_s_{clusters}_elec_{opts}_{solver}_op_solver.log"
         ),
         python=RESULTS
-        + "logs/solve_operations_network/base_s_{clusters}_elec_{opts}_op_python.log",
+        + "logs/solve_operations_network/base_s_{clusters}_elec_{opts}_{solver}_op_python.log",
     benchmark:
-        (RESULTS + "benchmarks/solve_operations_network/base_s_{clusters}_elec_{opts}")
+        (
+            RESULTS
+            + "benchmarks/solve_operations_network/base_s_{clusters}_elec_{opts}_{solver}"
+        )
     shadow:
         shadow_config
     threads: 4
@@ -63,13 +68,13 @@ rule solve_operations_network:
         runtime=config_provider("solving", "runtime", default="6h"),
     params:
         options=config_provider("solving", "options"),
-        solving=config_provider("solving"),
+        solving=solving_for_solver,
         foresight=config_provider("foresight"),
         co2_sequestration_potential=config_provider(
             "sector", "co2_sequestration_potential", default=200
         ),
         custom_extra_functionality=input_custom_extra_functionality,
     message:
-        "Solving electricity network operations optimization for {wildcards.clusters} clusters and {wildcards.opts} electric options"
+        "Solving electricity network operations optimization with {wildcards.solver} for {wildcards.clusters} clusters and {wildcards.opts} electric options"
     script:
         scripts("solve_operations_network.py")

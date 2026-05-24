@@ -158,9 +158,77 @@ def dataset_version(
     return dataset
 
 
+def ensure_list(value):
+    return value if isinstance(value, list) else [value]
+
+
+def solver_run_specs(w=None):
+    if w is None:
+        solver = config["solving"]["solver"]
+        names = ensure_list(solver["name"])
+        options = ensure_list(solver["options"])
+    else:
+        names = ensure_list(config_provider("solving", "solver", "name")(w))
+        options = ensure_list(config_provider("solving", "solver", "options")(w))
+
+    if len(options) == 1 and len(names) > 1:
+        options = options * len(names)
+    if len(options) != len(names):
+        raise ValueError(
+            "solving.solver.options must either contain one option set or one "
+            "option set per entry in solving.solver.name."
+        )
+
+    name_counts = {name: names.count(name) for name in set(names)}
+    occurrences = {}
+    labels = set()
+    specs = []
+    for name, option in zip(names, options):
+        occurrences[name] = occurrences.get(name, 0) + 1
+        label = name
+        if name_counts[name] > 1 and occurrences[name] > 1:
+            label = f"{name}_{occurrences[name]}"
+
+        original_label = label
+        suffix = 2
+        while label in labels:
+            label = f"{original_label}_{suffix}"
+            suffix += 1
+
+        labels.add(label)
+        specs.append({"label": label, "name": name, "options": option})
+
+    return specs
+
+
+def solver_names(w=None):
+    return [solver["label"] for solver in solver_run_specs(w)]
+
+
+def primary_solver_name(w):
+    return solver_run_specs(w)[0]["name"]
+
+
+def solving_for_solver(w):
+    solving = copy.deepcopy(config_provider("solving")(w))
+    solver_by_label = {solver["label"]: solver for solver in solver_run_specs(w)}
+    if w.solver not in solver_by_label:
+        raise ValueError(
+            f"Solver wildcard '{w.solver}' is not configured in "
+            "solving.solver.name."
+        )
+    selected_solver = solver_by_label[w.solver]
+    solving["solver"]["name"] = selected_solver["name"]
+    solving["solver"]["options"] = selected_solver["options"]
+    return solving
+
+
 def solver_threads(w):
-    solver_options = config_provider("solving", "solver_options")(w)
-    option_set = config_provider("solving", "solver", "options")(w)
+    solving = (
+        solving_for_solver(w) if "solver" in w.keys() else config_provider("solving")(w)
+    )
+    solver_options = solving["solver_options"]
+    option_set = solving["solver"]["options"]
     solver_option_set = solver_options[option_set]
     threads = solver_option_set.get("threads") or solver_option_set.get("Threads") or 4
     return threads
@@ -211,6 +279,7 @@ def solved_previous_horizon(w):
         RESULTS
         + "networks/base_s_{clusters}_{opts}_{sector_opts}_"
         + planning_horizon_p
+        + "_{solver}"
         + ".nc"
     )
 
