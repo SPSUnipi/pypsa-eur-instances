@@ -663,6 +663,7 @@ if __name__ == "__main__":
 
     # temporal aggregate
     solver_name = snakemake.config["solving"]["solver"]["name"]
+    solver_name = solver_name[0] if isinstance(solver_name, list) else solver_name
     segments = snakemake.params.time_resolution
     if isinstance(segments, (int, float)):
         apply_time_segmentation_perfect(n, segments, solver_name=solver_name)

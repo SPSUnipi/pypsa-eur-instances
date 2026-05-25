@@ -96,26 +96,26 @@ rule solve_sector_network_perfect:
         costs=resources("costs_2030_processed.csv"),
     output:
         network=RESULTS
-        + "networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.nc",
+        + "networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc",
         config=RESULTS
-        + "configs/config.base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.yaml",
+        + "configs/config.base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.yaml",
         model=(
             RESULTS
-            + "models/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.nc"
+            + "models/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc"
             if config["solving"]["options"]["store_model"]
             else []
         ),
     log:
         solver=RESULTS
-        + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_solver.log",
+        + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}_solver.log",
         python=RESULTS
-        + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_python.log",
+        + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}_python.log",
         memory=RESULTS
-        + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_memory.log",
+        + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}_memory.log",
     benchmark:
         (
             RESULTS
-            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years}"
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}"
         )
     shadow:
         shadow_config
@@ -123,7 +123,7 @@ rule solve_sector_network_perfect:
     resources:
         mem_mb=config_provider("solving", "mem"),
     params:
-        solving=config_provider("solving"),
+        solving=solving_for_solver,
         foresight=config_provider("foresight"),
         sector=config_provider("sector"),
         planning_horizons=config_provider("scenario", "planning_horizons"),
@@ -132,18 +132,19 @@ rule solve_sector_network_perfect:
         ),
         custom_extra_functionality=input_custom_extra_functionality,
     message:
-        "Solving sector-coupled network with perfect foresight for {wildcards.clusters} clusters, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+        "Solving sector-coupled network with perfect foresight using {wildcards.solver} for {wildcards.clusters} clusters, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
     script:
         scripts("solve_network.py")
 
 
 def input_networks_make_summary_perfect(w):
     return {
-        f"networks_s_{clusters}_{opts}_{sector_opts}": RESULTS
-        + f"networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.nc"
+        f"networks_s_{clusters}_{opts}_{sector_opts}_{solver}": RESULTS
+        + f"networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc"
         for clusters in config_provider("scenario", "clusters")(w)
         for opts in config_provider("scenario", "opts")(w)
         for sector_opts in config_provider("scenario", "sector_opts")(w)
+        for solver in solver_names(w)
     }
 
 

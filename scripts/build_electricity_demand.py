@@ -311,7 +311,9 @@ if __name__ == "__main__":
         synthetic_load = pd.read_csv(fn, index_col=0, parse_dates=True)
         # UA, MD, XK, CY, MT do not appear in synthetic load data
         countries = list(set(countries) - set(["UA", "MD", "XK", "CY", "MT"]))
-        synthetic_load = synthetic_load.loc[snapshots, countries]
+        synthetic_load = synthetic_load.loc[
+            synthetic_load.index.intersection(snapshots), countries
+        ]
         load = load.combine_first(synthetic_load)
 
     assert not load.isna().any().any(), (

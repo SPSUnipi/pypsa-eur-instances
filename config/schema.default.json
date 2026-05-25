@@ -5483,14 +5483,34 @@
           "description": "Configuration for `solving.solver` settings.",
           "properties": {
             "name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ],
               "default": "gurobi",
-              "description": "Solver to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow.",
-              "type": "string"
+              "description": "Solver or list of solvers to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow."
             },
             "options": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ],
               "default": "gurobi-default",
-              "description": "Link to specific parameter settings.",
-              "type": "string"
+              "description": "Solver option set or list of option sets paired with `name`."
             }
           }
         },
@@ -7805,14 +7825,34 @@
       "description": "Configuration for `solving.solver` settings.",
       "properties": {
         "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
           "default": "gurobi",
-          "description": "Solver to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow.",
-          "type": "string"
+          "description": "Solver or list of solvers to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow."
         },
         "options": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
           "default": "gurobi-default",
-          "description": "Link to specific parameter settings.",
-          "type": "string"
+          "description": "Solver option set or list of option sets paired with `name`."
         }
       }
     },
@@ -12547,14 +12587,34 @@
           "description": "Configuration for `solving.solver` settings.",
           "properties": {
             "name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ],
               "default": "gurobi",
-              "description": "Solver to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow.",
-              "type": "string"
+              "description": "Solver or list of solvers to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow."
             },
             "options": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ],
               "default": "gurobi-default",
-              "description": "Link to specific parameter settings.",
-              "type": "string"
+              "description": "Solver option set or list of option sets paired with `name`."
             }
           }
         },

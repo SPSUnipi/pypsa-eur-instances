@@ -1272,6 +1272,16 @@ solving:
       barhgreltol: 1.0e-05
     "cbc-default": {}
     "glpk-default": {}
+    "smspp-ucblock":
+      capacity_expansion_ucblock: true
+    "smspp-investmentblock":
+      capacity_expansion_ucblock: false
+    "smspp-stochastic":
+      stochastic_parameters:
+        stochastic_type: tssb
+        parameters:
+        - demand
+        - renewables
   check_objective:
     enable: false
     expected_value:

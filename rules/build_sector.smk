@@ -1500,7 +1500,7 @@ rule time_aggregation:
     params:
         time_resolution=config_provider("clustering", "temporal"),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
-        solver_name=config_provider("solving", "solver", "name"),
+        solver_name=primary_solver_name,
     message:
         "Performing time series aggregation for temporal resolution reduction for {wildcards.clusters} clusters and {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
     script:

@@ -347,6 +347,7 @@ if __name__ == "__main__":
         n = apply_time_chunking(n, time_resolution)
     elif is_string and time_resolution.lower().endswith("seg"):
         solver_name = snakemake.config["solving"]["solver"]["name"]
+        solver_name = solver_name[0] if isinstance(solver_name, list) else solver_name
         segments = int(time_resolution.replace("seg", ""))
         n = apply_time_segmentation(n, segments, solver_name)
 

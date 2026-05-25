@@ -610,6 +610,7 @@ if __name__ == "__main__":
     params = snakemake.params
     mode = params.mode
     solver_name = snakemake.config["solving"]["solver"]["name"]
+    solver_name = solver_name[0] if isinstance(solver_name, list) else solver_name
 
     n = pypsa.Network(snakemake.input.network)
     buses_prev, lines_prev, links_prev = len(n.buses), len(n.lines), len(n.links)

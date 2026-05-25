@@ -26,12 +26,14 @@ Additionally, some extra constraints specified in :mod:`solve_network` are added
     based on the rule :mod:`solve_network`.
 """
 
+import copy
 import importlib
 import logging
 import os
 import re
 import sys
 from functools import partial
+from pathlib import Path
 from typing import Any
 
 import linopy
@@ -54,6 +56,7 @@ from scripts._helpers import (
 )
 
 logger = logging.getLogger(__name__)
+SMSPP_SOLVER_NAME = "smspp"
 
 # Allow for PyPSA versions <0.35
 if PYPSA_V1:
@@ -64,6 +67,57 @@ else:
 
 class ObjectiveValueError(Exception):
     pass
+
+
+def is_smspp_solver(solver_name: str) -> bool:
+    """Return whether the configured solver uses PyPSA's SMS++ accessor."""
+    return solver_name.lower() == SMSPP_SOLVER_NAME
+
+
+def resolve_smspp_solver_options(
+    solve_kwargs: dict,
+    output_network: str | None = None,
+) -> tuple[dict, bool]:
+    """Resolve SMS++ transformation options from workflow solve kwargs."""
+    solver_options = dict(solve_kwargs.get("solver_options") or {})
+    verbose = bool(solver_options.pop("verbose", False))
+
+    stochastic_parameters = dict(solver_options.pop("stochastic_parameters", {}) or {})
+    if "stochastic_type" in solver_options:
+        stochastic_parameters["stochastic_type"] = solver_options.pop(
+            "stochastic_type"
+        )
+    if "parameters" in solver_options:
+        stochastic_parameters["parameters"] = solver_options.pop("parameters")
+    if stochastic_parameters:
+        solver_options["stochastic_parameters"] = stochastic_parameters
+
+    if output_network:
+        output_path = Path(output_network)
+        solver_options.setdefault("workdir", str(output_path.parent.parent / "smspp"))
+        solver_options.setdefault("name", output_path.stem)
+
+    if log_fn := solve_kwargs.get("log_fn"):
+        solver_options.setdefault("fp_log", log_fn)
+
+    return solver_options, verbose
+
+
+def run_smspp_optimization(
+    n: pypsa.Network,
+    solve_kwargs: dict,
+    output_network: str | None = None,
+) -> tuple[str, str]:
+    """Create and solve an SMS++ model for a PyPSA network."""
+    solver_options, verbose = resolve_smspp_solver_options(
+        solve_kwargs,
+        output_network=output_network,
+    )
+    logger.info("Creating SMS++ model...")
+    n.optimize.smspp.create_model(solver_options=solver_options, verbose=verbose)
+
+    logger.info("Solving SMS++ model...")
+    return n.optimize.smspp.solve_model(verbose=verbose)
 
 
 def add_land_use_constraint_perfect(n: pypsa.Network) -> None:
@@ -1506,10 +1560,21 @@ if __name__ == "__main__":
     # Determine solve mode
     rolling_horizon = cf_solving.get("rolling_horizon", False)
     skip_iterations = cf_solving.get("skip_iterations", False)
+    solver_name = snakemake.params.solving["solver"]["name"]
+    using_smspp = is_smspp_solver(solver_name)
+
+    if using_smspp and rolling_horizon:
+        raise NotImplementedError("SMS++ optimization does not support rolling_horizon.")
 
     if not n.lines.s_nom_extendable.any():
         skip_iterations = True
         logger.info("No expandable lines found. Skipping iterative solving.")
+
+    if using_smspp and not skip_iterations:
+        raise NotImplementedError(
+            "SMS++ optimization does not support iterative transmission expansion. "
+            "Set solving.options.skip_iterations to true for SMS++ solver runs."
+        )
 
     logging_frequency = snakemake.config.get("solving", {}).get(
         "mem_logging_frequency", 30
@@ -1538,7 +1603,11 @@ if __name__ == "__main__":
             status, condition = "", ""
 
         elif skip_iterations:
-            logger.info("Using single-pass optimization...")
+            logger.info(
+                "Using SMS++ single-pass optimization..."
+                if using_smspp
+                else "Using single-pass optimization..."
+            )
             model_kwargs, solve_kwargs = collect_kwargs(
                 snakemake.config,
                 snakemake.params.solving,
@@ -1546,17 +1615,27 @@ if __name__ == "__main__":
                 log_fn=snakemake.log.solver,
                 mode="single",
             )
-            create_optimization_model(
-                n,
-                config=snakemake.config,
-                params=snakemake.params,
-                model_kwargs=model_kwargs,
-                solve_kwargs=solve_kwargs,
-                planning_horizons=planning_horizons,
-            )
 
-            logger.info("Solving model...")
-            status, condition = n.optimize.solve_model(**solve_kwargs)
+            if using_smspp:
+                n.config = snakemake.config
+                n.params = snakemake.params
+                status, condition = run_smspp_optimization(
+                    n,
+                    solve_kwargs=solve_kwargs,
+                    output_network=snakemake.output.network,
+                )
+            else:
+                create_optimization_model(
+                    n,
+                    config=snakemake.config,
+                    params=snakemake.params,
+                    model_kwargs=model_kwargs,
+                    solve_kwargs=solve_kwargs,
+                    planning_horizons=planning_horizons,
+                )
+
+                logger.info("Solving model...")
+                status, condition = n.optimize.solve_model(**solve_kwargs)
 
         else:
             logger.info("Using iterative transmission expansion optimization...")
@@ -1592,12 +1671,18 @@ if __name__ == "__main__":
         raise RuntimeError("Solving status 'warning'. Discarding solution.")
 
     if "infeasible" in condition:
-        labels = n.model.compute_infeasibilities()
-        logger.info(f"Labels:\n{labels}")
-        n.model.print_infeasibilities()
-        raise RuntimeError("Solving status 'infeasible'. Infeasibilities computed.")
+        if hasattr(n, "model") and n.model is not None:
+            labels = n.model.compute_infeasibilities()
+            logger.info(f"Labels:\n{labels}")
+            n.model.print_infeasibilities()
+            raise RuntimeError(
+                "Solving status 'infeasible'. Infeasibilities computed."
+            )
+        raise RuntimeError("Solving status 'infeasible'.")
 
-    n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
+    n.meta = copy.deepcopy(snakemake.config)
+    n.meta["solving"] = snakemake.params.solving
+    n.meta["wildcards"] = dict(snakemake.wildcards)
     n.export_to_netcdf(snakemake.output.network)
 
     if snakemake.output.get("model"):

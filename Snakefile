@@ -68,6 +68,7 @@ localrules:
 wildcard_constraints:
     clusters="[0-9]+(m|c)?|all|adm",
     opts=r"[-+a-zA-Z0-9\.]*",
+    solver=r"[-+a-zA-Z0-9_\.]+",
     sector_opts=r"[-+a-zA-Z0-9\.\s]*",
     planning_horizons=r"[0-9]{4}",
 
@@ -115,8 +116,9 @@ rule all:
         ),
         expand(
             RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-costs-all_{planning_horizons}.pdf",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-costs-all_{planning_horizons}_{solver}.pdf",
             run=config["run"]["name"],
+            solver=solver_names(),
             **config["scenario"],
         ),
         # COP profiles plots
@@ -128,21 +130,23 @@ rule all:
         lambda w: expand(
             (
                 RESULTS
-                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-h2_network_{planning_horizons}.pdf"
+                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-h2_network_{planning_horizons}_{solver}.pdf"
                 if config_provider("sector", "H2_network")(w)
                 else []
             ),
             run=config["run"]["name"],
+            solver=solver_names(w),
             **config["scenario"],
         ),
         lambda w: expand(
             (
                 RESULTS
-                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-ch4_network_{planning_horizons}.pdf"
+                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-ch4_network_{planning_horizons}_{solver}.pdf"
                 if config_provider("sector", "gas_network")(w)
                 else []
             ),
             run=config["run"]["name"],
+            solver=solver_names(w),
             **config["scenario"],
         ),
         lambda w: expand(
@@ -155,82 +159,91 @@ rule all:
         ),
         expand(
             RESULTS
-            + "graphics/balance_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}",
+            + "graphics/balance_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
             run=config["run"]["name"],
+            solver=solver_names(),
             **config["scenario"],
         ),
         expand(
             RESULTS
-            + "graphics/heatmap_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}",
+            + "graphics/heatmap_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
             run=config["run"]["name"],
+            solver=solver_names(),
             **config["scenario"],
         ),
         # Explicitly list heat source types for temperature maps
         lambda w: expand(
             (
                 RESULTS
-                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-heat_source_temperature_map_river_water.html"
+                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-heat_source_temperature_map_river_water.html"
                 if config_provider("plotting", "enable_heat_source_maps")(w)
                 and "river_water"
                 in config_provider("sector", "heat_pump_sources", "urban central")(w)
                 else []
             ),
             **config["scenario"],
+            solver=solver_names(w),
             run=config["run"]["name"],
         ),
         lambda w: expand(
             (
                 RESULTS
-                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-heat_source_temperature_map_sea_water.html"
+                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-heat_source_temperature_map_sea_water.html"
                 if config_provider("plotting", "enable_heat_source_maps")(w)
                 and "sea_water"
                 in config_provider("sector", "heat_pump_sources", "urban central")(w)
                 else []
             ),
             **config["scenario"],
+            solver=solver_names(w),
             run=config["run"]["name"],
         ),
         lambda w: expand(
             (
                 RESULTS
-                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-heat_source_temperature_map_ambient_air.html"
+                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-heat_source_temperature_map_ambient_air.html"
                 if config_provider("plotting", "enable_heat_source_maps")(w)
                 and "air"
                 in config_provider("sector", "heat_pump_sources", "urban central")(w)
                 else []
             ),
             **config["scenario"],
+            solver=solver_names(w),
             run=config["run"]["name"],
         ),
         # Only river_water has energy maps
         lambda w: expand(
             (
                 RESULTS
-                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-heat_source_energy_map_river_water.html"
+                + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-heat_source_energy_map_river_water.html"
                 if config_provider("plotting", "enable_heat_source_maps")(w)
                 and "river_water"
                 in config_provider("sector", "heat_pump_sources", "urban central")(w)
                 else []
             ),
             **config["scenario"],
+            solver=solver_names(w),
             run=config["run"]["name"],
         ),
         expand(
             RESULTS
-            + "graphics/balance_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}",
+            + "graphics/balance_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
             run=config["run"]["name"],
+            solver=solver_names(),
             **config["scenario"],
         ),
         expand(
             RESULTS
-            + "graphics/heatmap_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}",
+            + "graphics/heatmap_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
             run=config["run"]["name"],
+            solver=solver_names(),
             **config["scenario"],
         ),
         expand(
             RESULTS
-            + "graphics/interactive_bus_balance/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}",
+            + "graphics/interactive_bus_balance/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
             run=config["run"]["name"],
+            solver=solver_names(),
             **config["scenario"],
         ),
         lambda w: balance_map_paths("static", w),

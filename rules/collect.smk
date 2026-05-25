@@ -68,9 +68,10 @@ rule prepare_sector_networks:
 rule solve_elec_networks:
     input:
         expand(
-            RESULTS + "networks/base_s_{clusters}_elec_{opts}.nc",
+            RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
             **config["scenario"],
             run=config["run"]["name"],
+            solver=solver_names(),
         ),
     message:
         "Collecting solved electricity network files"
@@ -80,9 +81,10 @@ rule solve_sector_networks:
     input:
         expand(
             RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
             **config["scenario"],
             run=config["run"]["name"],
+            solver=solver_names(),
         ),
     message:
         "Collecting solved sector-coupled network files"
@@ -108,10 +110,11 @@ def balance_map_paths(kind, w):
 
     return expand(
         RESULTS
-        + f"maps/{kind}/base_s_{{clusters}}_{{opts}}_{{sector_opts}}_{{planning_horizons}}"
+        + f"maps/{kind}/base_s_{{clusters}}_{{opts}}_{{sector_opts}}_{{planning_horizons}}_{{solver}}"
         f"-balance_map_{{carrier}}.{'pdf'if kind== 'static' else 'html'}",
         **config["scenario"],
         run=config["run"]["name"],
+        solver=solver_names(),
         carrier=config_provider("plotting", cfg_key, "bus_carriers")(w),
     )
 
