@@ -17,6 +17,10 @@ foresight: overnight
 scenario:
   clusters:
   - 2
+  # - 5
+  # - 10
+  # - 20
+  # - 50
   opts:
   - ''
 
@@ -25,7 +29,8 @@ countries:
 
 clustering:
   temporal:
-    resolution_elec: 12c24
+    resolution_elec: false
+    resolution_sector: 12c24
 
 solving:
   options:
@@ -41,3 +46,21 @@ solving:
       capacity_expansion_ucblock: true
     smspp-investmentblock:
       capacity_expansion_ucblock: false
+
+sector:  # used only when the sector rule is executed
+  gas_network: true
+  H2_retrofit: true
+  hydrogen_turbine: false
+  regional_oil_demand: false
+  regional_co2_sequestration_potential:
+    enable: false
+  co2_spatial: false
+  co2_network: false
+  methanol:
+    methanol_to_power:
+      ocgt: false
+    biomass_to_methanol: false
+  ammonia: false
+  biomass_spatial: false
+  biomass_to_liquid: false
+  electrobiofuels: false
