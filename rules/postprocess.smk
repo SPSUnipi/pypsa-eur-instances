@@ -244,6 +244,134 @@ if config["foresight"] == "perfect":
             scripts("plot_power_network_perfect.py")
 
 
+rule make_solver_comparison:
+    input:
+        networks=lambda w: expand(
+            RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            solver=solver_names(w),
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            solver=solver_names(w),
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_elec_{opts}.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_elec_{opts}.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_elec_{opts}.csv",
+    log:
+        RESULTS + "logs/make_solver_comparison/base_s_{clusters}_elec_{opts}.log",
+    benchmark:
+        RESULTS + "benchmarks/make_solver_comparison/base_s_{clusters}_elec_{opts}"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved electricity networks across configured solvers for {wildcards.clusters} clusters and {wildcards.opts} electric options"
+    script:
+        scripts("compare_solver_results.py")
+
+
+rule make_solver_comparison_sector:
+    input:
+        networks=lambda w: expand(
+            RESULTS
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            planning_horizons=w.planning_horizons,
+            solver=solver_names(w),
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            planning_horizons=w.planning_horizons,
+            solver=solver_names(w),
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+    log:
+        RESULTS
+        + "logs/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved sector-coupled networks across configured solvers for {wildcards.clusters} clusters, {wildcards.planning_horizons} planning horizon, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+    script:
+        scripts("compare_solver_results.py")
+
+
+rule make_solver_comparison_sector_perfect:
+    input:
+        networks=lambda w: expand(
+            RESULTS
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            solver=solver_names(w),
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            solver=solver_names(w),
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+    log:
+        RESULTS
+        + "logs/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved perfect-foresight sector-coupled networks across configured solvers for {wildcards.clusters} clusters, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+    script:
+        scripts("compare_solver_results.py")
+
+
 rule make_summary:
     input:
         network=RESULTS
