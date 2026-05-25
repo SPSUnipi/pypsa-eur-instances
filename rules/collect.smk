@@ -9,6 +9,7 @@ localrules:
     prepare_elec_networks,
     prepare_sector_networks,
     solve_elec_networks,
+    compare_solver_outputs,
     solve_sector_networks,
 
 
@@ -75,6 +76,17 @@ rule solve_elec_networks:
         ),
     message:
         "Collecting solved electricity network files"
+
+
+rule compare_solver_outputs:
+    input:
+        expand(
+            RESULTS + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}.csv",
+            **config["scenario"],
+            run=config["run"]["name"],
+        ),
+    message:
+        "Collecting solver comparison files"
 
 
 rule solve_sector_networks:
