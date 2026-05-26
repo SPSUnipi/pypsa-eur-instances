@@ -244,7 +244,7 @@ if config["foresight"] == "perfect":
             scripts("plot_power_network_perfect.py")
 
 
-rule make_solver_comparison:
+rule make_solver_comparison_elec:
     input:
         networks=lambda w: expand(
             RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
