@@ -29,7 +29,7 @@ countries:
 
 clustering:
   temporal:
-    resolution_elec: 12c24
+    resolution_elec: 4c24
 
 solving:
   options:
