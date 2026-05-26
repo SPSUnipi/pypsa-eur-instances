@@ -121,6 +121,8 @@ rule all:
             solver=solver_names(),
             **config["scenario"],
         ),
+        lambda w: electricity_solver_comparison_paths(w)
+        + sector_solver_comparison_paths(w),
         # COP profiles plots
         expand(
             RESULTS + "graphs/cop_profiles_s_{clusters}_{planning_horizons}.html",
