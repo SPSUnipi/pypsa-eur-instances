@@ -1500,6 +1500,80 @@ def extra_functionality_stochastic(
         custom_extra_functionality = getattr(module, module_name)
         custom_extra_functionality(n, snapshots, snakemake)  # pylint: disable=E0601
 
+def extra_functionality_stochastic_minimal(
+    n: pypsa.Network,
+    snapshots: pd.DatetimeIndex,
+    planning_horizons: str | None = None,
+) -> None:
+    """
+    Minimal extra functionality for stochastic sector-coupled runs.
+
+    The goal is to avoid calling deterministic extra constraints that assume
+    plain component indices, because stochastic networks use MultiIndex
+    component tables with levels such as (scenario, name).
+
+    Re-enable additional constraints one by one only after the base stochastic
+    solve is feasible.
+    """
+    del planning_horizons  # Unused in the minimal stochastic version.
+
+    config = n.config
+
+    logger.warning(
+        "Using minimal stochastic extra functionality. "
+        "Several deterministic extra constraints are intentionally skipped."
+    )
+
+    # Keep TES constraints only if the stochastic-safe versions are implemented.
+    if config.get("sector", {}).get("tes", False):
+        bus_names = _name_level(n.buses.index).astype(str)
+        if bus_names.str.contains(
+            r"urban central heat|urban decentral heat|rural heat",
+            case=False,
+            na=False,
+        ).any():
+            logger.info("Adding stochastic-safe TES constraints.")
+            add_TES_energy_to_power_ratio_constraints(n)
+            add_TES_charger_ratio_constraints(n)
+
+    # Keep battery constraint only if the stochastic-safe version is implemented.
+    logger.info("Adding stochastic-safe battery constraints.")
+    add_battery_constraints(n)
+
+    # Keep CO2 atmosphere only if the stochastic-safe version is implemented.
+    if n._multi_invest:
+        logger.warning(
+            "Skipping stochastic multi-investment carbon constraints for now."
+        )
+    else:
+        logger.info("Adding stochastic-safe CO2 atmosphere constraint.")
+        add_co2_atmosphere_constraint_stochastic(n, snapshots)
+
+    # Keep import limit only if enabled and stochastic-safe version is implemented.
+    if config.get("sector", {}).get("imports", {}).get("enable", False):
+        logger.info("Adding stochastic-safe import limit constraint.")
+        add_import_limit_constraint_stochastic(n, snapshots)
+
+    # Do not call user custom extra functionality unless explicitly tested.
+    if n.params.custom_extra_functionality:
+        logger.warning(
+            "Skipping custom_extra_functionality in stochastic mode for now. "
+            "It may not be stochastic-safe."
+        )
+
+    # Intentionally skipped for now:
+    # - BAU constraints
+    # - SAFE constraints
+    # - CCL constraints
+    # - EQ constraints
+    # - operational reserve constraints
+    # - solar potential constraints
+    # - lossy bidirectional link constraints
+    # - pipe retrofit constraints
+    # - CHP constraints
+    # - gas boiler retrofit constraints
+    # - flexible EGS constraints
+
 def extra_functionality(
     n: pypsa.Network, snapshots: pd.DatetimeIndex, planning_horizons: str | None = None
 ) -> None:
@@ -1738,14 +1812,14 @@ def create_optimization_model(
     n.config = config
     n.params = params
 
-    # Create optimization model
     logger.info("Creating optimization model...")
     n.optimize.create_model(**model_kwargs)
 
-    # Add extra functionality (custom constraints)
     logger.info("Adding extra functionality (custom constraints)...")
-    extra_fn = extra_functionality_stochastic if _has_scenarios(n) else extra_functionality
-    extra_fn(n, n.snapshots, planning_horizons)
+    if _has_scenarios(n):
+        extra_functionality_stochastic_minimal(n, n.snapshots, planning_horizons)
+    else:
+        extra_functionality(n, n.snapshots, planning_horizons)
 
 
 if __name__ == "__main__":
