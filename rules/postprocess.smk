@@ -2,6 +2,36 @@
 #
 # SPDX-License-Identifier: MIT
 
+def _stoch_cfg():
+    """Return stochastic scenario config, if present."""
+    return config.get("stochastic_scenarios", {}) or {}
+
+
+def _stoch_enabled():
+    """Whether stochastic mode is enabled."""
+    return bool(_stoch_cfg().get("enable", False))
+
+
+def _stoch_use_expected_postprocess():
+    """Whether standard postprocess rules should consume the expected deterministic view."""
+    if not _stoch_enabled():
+        return False
+    pp = _stoch_cfg().get("postprocess", {}) or {}
+    return bool(pp.get("use_expected", True))
+
+
+def pp_network_expected(w):
+    """Return the deterministic network used by standard postprocess rules."""
+    base = (
+        RESULTS
+        + f"networks/base_s_{w.clusters}_{w.opts}_{w.sector_opts}_{w.planning_horizons}.nc"
+    )
+
+    if _stoch_use_expected_postprocess():
+        return base.replace(".nc", "__exp.nc")
+
+    return base
+
 
 if config["foresight"] != "perfect":
 
@@ -43,8 +73,7 @@ if config["foresight"] != "perfect":
 
     rule plot_power_network:
         input:
-            network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            network=pp_network_expected,
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             map=RESULTS
@@ -70,8 +99,7 @@ if config["foresight"] != "perfect":
 
     rule plot_hydrogen_network:
         input:
-            network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            network=pp_network_expected,
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             map=RESULTS
@@ -97,8 +125,7 @@ if config["foresight"] != "perfect":
 
     rule plot_gas_network:
         input:
-            network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            network=pp_network_expected,
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             map=RESULTS
@@ -123,8 +150,7 @@ if config["foresight"] != "perfect":
 
     rule plot_balance_map:
         input:
-            network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            network=pp_network_expected,
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             RESULTS
@@ -150,8 +176,7 @@ if config["foresight"] != "perfect":
 
     rule plot_balance_map_interactive:
         input:
-            network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            network=pp_network_expected,
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             RESULTS
@@ -246,8 +271,7 @@ if config["foresight"] == "perfect":
 
 rule make_summary:
     input:
-        network=RESULTS
-        + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+        network=pp_network_expected,
     output:
         nodal_costs=RESULTS
         + "csvs/individual/nodal_costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
@@ -464,8 +488,7 @@ rule plot_summary:
 
 rule plot_balance_timeseries:
     input:
-        network=RESULTS
-        + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+        network=pp_network_expected,
         rc="matplotlibrc",
     output:
         directory(
@@ -493,8 +516,7 @@ rule plot_balance_timeseries:
 
 rule plot_heatmap_timeseries:
     input:
-        network=RESULTS
-        + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+        network=pp_network_expected,
         rc="matplotlibrc",
     output:
         directory(
@@ -592,8 +614,7 @@ rule plot_cop_profiles:
 
 rule plot_interactive_bus_balance:
     input:
-        network=RESULTS
-        + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+        network=pp_network_expected,
         rc="matplotlibrc",
     output:
         directory=directory(
