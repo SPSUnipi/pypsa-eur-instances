@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
+import re
 import yaml
 
 
@@ -27,6 +28,9 @@ def stochastic_scenario_names():
 
 
 STOCHASTIC_SCENARIOS = stochastic_scenario_names()
+STOCHASTIC_SCENARIO_PATTERN = "|".join(
+    re.escape(str(scenario)) for scenario in STOCHASTIC_SCENARIOS
+)
 
 
 rule build_stochastic_network:
@@ -161,7 +165,7 @@ if config["stochastic_scenarios"]["export"]["scenarios"]:
                 + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__sc-{stoch_scenario}"
             )
         wildcard_constraints:
-            stoch_scenario="|".join(STOCHASTIC_SCENARIOS),
+            stoch_scenario=STOCHASTIC_SCENARIO_PATTERN,
         threads: 1
         resources:
             mem_mb=8000,
@@ -173,3 +177,4 @@ if config["stochastic_scenarios"]["export"]["scenarios"]:
             "Exporting deterministic scenario view from stochastic solution for {wildcards.stoch_scenario}"
         script:
             scripts("export_stochastic_views.py")
+    
