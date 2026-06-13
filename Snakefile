@@ -90,7 +90,13 @@ include: "rules/development.smk"
 
 if config["foresight"] == "overnight":
 
-    include: "rules/solve_overnight.smk"
+    if config["stochastic_scenarios"]["enable"]:
+
+        include: "rules/solve_stochastic.smk"
+
+    else:
+
+        include: "rules/solve_overnight.smk"
 
 
 if config["foresight"] == "myopic":

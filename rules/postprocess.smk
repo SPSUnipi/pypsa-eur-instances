@@ -20,17 +20,20 @@ def _stoch_use_expected_postprocess():
     return bool(pp.get("use_expected", True))
 
 
-def pp_network_expected(w):
-    """Return the deterministic network used by standard postprocess rules."""
-    base = (
+def get_network(w):
+    """Return the solved network used by post-processing rules."""
+    network = (
         RESULTS
         + f"networks/base_s_{w.clusters}_{w.opts}_{w.sector_opts}_{w.planning_horizons}.nc"
     )
 
-    if _stoch_use_expected_postprocess():
-        return base.replace(".nc", "__exp.nc")
+    if (
+        config["stochastic_scenarios"]["enable"]
+        and config["stochastic_scenarios"]["postprocess"]["use_expected"]
+    ):
+        return network.replace(".nc", "__exp.nc")
 
-    return base
+    return network
 
 
 if config["foresight"] != "perfect":

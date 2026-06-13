@@ -2,14 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 """
-Prepare a deterministic network and (optionally) convert it into a stochastic one.
+Build a stochastic PyPSA network from a deterministic pre-solve network.
 
-This script is intended to run BEFORE solve_network.py:
-- Load the pre-solve network
-- Call prepare_network(...) to add all components that must exist before set_scenarios
-- If enabled, call n.set_scenarios(...) and apply scenario-specific patches
-- If structured scenarios are configured, dispatch scenario builders by scenario name
-- Export the "pre-solve stochastic" network to NetCDF
+This script is intended to run before solve_network.py:
+- load the deterministic pre-solve network;
+- apply prepare_network(...);
+- call n.set_scenarios(...);
+- apply scenario-specific modifications;
+- export the stochastic pre-solve network.
 """
 
 import logging
@@ -1612,13 +1612,12 @@ if __name__ == "__main__":
         from scripts._helpers import mock_snakemake
 
         snakemake = mock_snakemake(
-            "stochasticify_sector_network",
+            "build_stochastic_network",
             opts="",
             clusters="adm",
             configfiles="config/test_stochastic_scenarios/config.yaml",
             sector_opts="",
             planning_horizons="2050",
-            run="land_transport_linear_ev",
         )
 
     configure_logging(snakemake)
