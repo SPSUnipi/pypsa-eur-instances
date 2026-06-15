@@ -7,32 +7,6 @@ import re
 import yaml
 
 
-def stochastic_scenario_names():
-    """Read stochastic scenario names from the external scenario file."""
-    scenario_file = Path(config["stochastic_scenarios"]["file"])
-
-    if not scenario_file.exists():
-        raise FileNotFoundError(f"Stochastic scenario file not found: {scenario_file}")
-
-    with scenario_file.open("r", encoding="utf-8") as f:
-        data = yaml.safe_load(f) or {}
-
-    scenarios = data.get("scenarios", data)
-
-    if not isinstance(scenarios, dict) or not scenarios:
-        raise ValueError(
-            f"Stochastic scenario file must contain a non-empty mapping: {scenario_file}"
-        )
-
-    return list(scenarios.keys())
-
-
-STOCHASTIC_SCENARIOS = stochastic_scenario_names()
-STOCHASTIC_SCENARIO_PATTERN = "|".join(
-    re.escape(str(scenario)) for scenario in STOCHASTIC_SCENARIOS
-)
-
-
 rule build_stochastic_network:
     input:
         network=resources(
@@ -118,22 +92,22 @@ rule solve_sector_network:
         scripts("solve_network.py")
 
 
-if config["stochastic_scenarios"]["export"]["expected"]:
+if config["stochastic_scenarios"]["export"]["average"]:
 
-    rule export_stochastic_expected:
+    rule export_stochastic_average:
         input:
             network=RESULTS
             + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
         output:
             network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__exp.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__avg.nc",
         log:
             python=RESULTS
-            + "logs/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__exp.log",
+            + "logs/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__avg.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__exp"
+                + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__avg"
             )
         threads: 1
         resources:
@@ -142,7 +116,7 @@ if config["stochastic_scenarios"]["export"]["expected"]:
             scenarios_file=config["stochastic_scenarios"]["file"],
             mode="expected",
         message:
-            "Exporting deterministic expected-value view from stochastic solution"
+            "Exporting deterministic average view from stochastic solution"
         script:
             scripts("export_stochastic_views.py")
 

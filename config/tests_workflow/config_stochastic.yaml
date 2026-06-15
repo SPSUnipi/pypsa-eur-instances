@@ -50,21 +50,12 @@ stochastic_scenarios:
   file: config/tests_workflow/stochastic_scenarios.yaml
 
   export:
-    expected: true
+    average: true
     scenarios: true
 
   postprocess:
-    use_expected: true
-    scenarios:
-      plot_power_network: false
-      plot_hydrogen_network: false
-      plot_gas_network: false
-      plot_balance_map: false
-      plot_balance_map_interactive: false
-      make_summary: false
-      plot_balance_timeseries: false
-      plot_heatmap_timeseries: false
-      plot_interactive_bus_balance: false
+    use_average: true
+    scenarios: true
 
 # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#countries
 countries:

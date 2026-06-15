@@ -373,7 +373,7 @@ def build_view(n: pypsa.Network, mode: str, probs: Dict[str, float], scenario: s
     """Return a deterministic-view network."""
     m = n.copy()
 
-    if mode not in {"expected", "scenario"}:
+    if mode not in {"average", "scenario"}:
         raise ValueError(f"Unknown mode={mode}")
 
     if mode == "scenario" and not scenario:
@@ -409,7 +409,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from scripts._helpers import mock_snakemake
 
-        snakemake = mock_snakemake("export_stochastic_expected",
+        snakemake = mock_snakemake("export_stochastic_average",
                                     configfiles=["config/test_stoch/config.yaml"],
                                     clusters='adm',
                                     opts='',
@@ -434,8 +434,8 @@ if __name__ == "__main__":
     except Exception:
         pass
 
-    if mode == "expected":
-        out = snakemake.output.expected
+    if mode == "average":
+        out = snakemake.output.average
     else:
         out = snakemake.output.scenario
 

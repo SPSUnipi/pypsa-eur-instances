@@ -11,9 +11,9 @@ def get_network(w):
 
     if (
         config["stochastic_scenarios"]["enable"]
-        and config["stochastic_scenarios"]["postprocess"]["use_expected"]
+        and config["stochastic_scenarios"]["postprocess"]["use_average"]
     ):
-        return network.replace(".nc", "__exp.nc")
+        return network.replace(".nc", "__avg.nc")
 
     return network
 
