@@ -304,3 +304,4 @@ rule plot_interactive_bus_balance_stochastic_scenario:
         "Plotting interactive bus balance for stochastic scenario {wildcards.stoch_scenario}"
     script:
         scripts("plot_interactive_bus_balance.py")
+

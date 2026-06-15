@@ -2,14 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 """
-Export deterministic "views" from a stochastic PyPSA network solution.
+Export deterministic views from a stochastic PyPSA network solution.
 
 Two modes:
-- expected: create __exp.nc where all time-dependent tables are probability-weighted averages
-- scenario: create __sc-{scenario}.nc where all scenario-dependent tables are sliced at a given scenario
+- average: create __avg.nc where scenario-dependent tables are probability-weighted averages
+- scenario: create __sc-{scenario}.nc where scenario-dependent tables are sliced at a given scenario
 
 This script is called by Snakemake rules:
-- export_stochastic_expected
+- export_stochastic_average
 - export_stochastic_scenario
 """
 
@@ -422,7 +422,7 @@ if __name__ == "__main__":
 
     probs = read_probabilities(snakemake.params.scenarios_file)
 
-    mode = getattr(snakemake.params, "mode", "expected")
+    mode = getattr(snakemake.params, "mode", "average")
     scenario = getattr(snakemake.params, "scenario", None)
 
     logger.info(f"Export mode={mode} scenario={scenario}")
@@ -434,10 +434,7 @@ if __name__ == "__main__":
     except Exception:
         pass
 
-    if mode == "average":
-        out = snakemake.output.average
-    else:
-        out = snakemake.output.scenario
+    out = snakemake.output.network
 
     m.export_to_netcdf(out)
     logger.info(f"Exported deterministic view to {out}")

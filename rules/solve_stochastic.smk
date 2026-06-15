@@ -114,7 +114,7 @@ if config["stochastic_scenarios"]["export"]["average"]:
             mem_mb=8000,
         params:
             scenarios_file=config["stochastic_scenarios"]["file"],
-            mode="expected",
+            mode="average",
         message:
             "Exporting deterministic average view from stochastic solution"
         script:
@@ -151,4 +151,6 @@ if config["stochastic_scenarios"]["export"]["scenarios"]:
             "Exporting deterministic scenario view from stochastic solution for {wildcards.stoch_scenario}"
         script:
             scripts("export_stochastic_views.py")
+
+
     
