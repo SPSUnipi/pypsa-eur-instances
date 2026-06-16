@@ -65,7 +65,4 @@ solving:
   options:
     load_shedding:
       enable: true
-      default_cost: 100000
-      all_carriers: true
-      carriers: {}
     transmission_losses: 0

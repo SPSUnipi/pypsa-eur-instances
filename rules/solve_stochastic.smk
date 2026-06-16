@@ -151,6 +151,3 @@ if config["stochastic_scenarios"]["export"]["scenarios"]:
             "Exporting deterministic scenario view from stochastic solution for {wildcards.stoch_scenario}"
         script:
             scripts("export_stochastic_views.py")
-
-
-    
