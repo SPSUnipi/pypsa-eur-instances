@@ -9,6 +9,8 @@ localrules:
     prepare_elec_networks,
     prepare_sector_networks,
     solve_elec_networks,
+    compare_solver_elec_outputs,
+    compare_solver_sector_outputs,
     solve_sector_networks,
 
 
@@ -68,21 +70,65 @@ rule prepare_sector_networks:
 rule solve_elec_networks:
     input:
         expand(
-            RESULTS + "networks/base_s_{clusters}_elec_{opts}.nc",
+            RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
             **config["scenario"],
             run=config["run"]["name"],
+            solver=solver_names(),
         ),
     message:
         "Collecting solved electricity network files"
+
+
+def electricity_solver_comparison_paths(w):
+    return expand(
+        RESULTS + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}.csv",
+        clusters=config_provider("scenario", "clusters")(w),
+        opts=config_provider("scenario", "opts")(w),
+    )
+
+
+def sector_solver_comparison_paths(w):
+    if config_provider("foresight")(w) == "perfect":
+        return expand(
+            RESULTS
+            + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+            clusters=config_provider("scenario", "clusters")(w),
+            opts=config_provider("scenario", "opts")(w),
+            sector_opts=config_provider("scenario", "sector_opts")(w),
+        )
+
+    return expand(
+        RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        clusters=config_provider("scenario", "clusters")(w),
+        opts=config_provider("scenario", "opts")(w),
+        sector_opts=config_provider("scenario", "sector_opts")(w),
+        planning_horizons=config_provider("scenario", "planning_horizons")(w),
+    )
+
+
+rule compare_solver_elec_outputs:
+    input:
+        electricity_solver_comparison_paths,
+    message:
+        "Collecting electricity solver comparison files"
+
+
+rule compare_solver_sector_outputs:
+    input:
+        sector_solver_comparison_paths,
+    message:
+        "Collecting sector-coupled solver comparison files"
 
 
 rule solve_sector_networks:
     input:
         expand(
             RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
             **config["scenario"],
             run=config["run"]["name"],
+            solver=solver_names(),
         ),
     message:
         "Collecting solved sector-coupled network files"
@@ -108,10 +154,11 @@ def balance_map_paths(kind, w):
 
     return expand(
         RESULTS
-        + f"maps/{kind}/base_s_{{clusters}}_{{opts}}_{{sector_opts}}_{{planning_horizons}}"
+        + f"maps/{kind}/base_s_{{clusters}}_{{opts}}_{{sector_opts}}_{{planning_horizons}}_{{solver}}"
         f"-balance_map_{{carrier}}.{'pdf'if kind== 'static' else 'html'}",
         **config["scenario"],
         run=config["run"]["name"],
+        solver=solver_names(),
         carrier=config_provider("plotting", cfg_key, "bus_carriers")(w),
     )
 

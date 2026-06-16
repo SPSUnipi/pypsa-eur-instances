@@ -698,7 +698,9 @@ outputs = [
 
 
 def make_summaries(networks_dict):
-    columns = pd.MultiIndex.from_tuples(networks_dict.keys(), names=["cluster", "opt"])
+    columns = pd.MultiIndex.from_tuples(
+        networks_dict.keys(), names=["cluster", "opt", "solver"]
+    )
     df = {}
 
     for output in outputs:
@@ -731,6 +733,32 @@ def to_csv(df):
         df[key].to_csv(snakemake.output[key])
 
 
+def solver_labels(solver_config):
+    names = solver_config["name"]
+    names = names if isinstance(names, list) else [names]
+
+    name_counts = {name: names.count(name) for name in set(names)}
+    occurrences = {}
+    labels = set()
+    result = []
+    for name in names:
+        occurrences[name] = occurrences.get(name, 0) + 1
+        label = name
+        if name_counts[name] > 1 and occurrences[name] > 1:
+            label = f"{name}_{occurrences[name]}"
+
+        original_label = label
+        suffix = 2
+        while label in labels:
+            label = f"{original_label}_{suffix}"
+            suffix += 1
+
+        labels.add(label)
+        result.append(label)
+
+    return result
+
+
 if __name__ == "__main__":
     # Detect running outside of snakemake and mock snakemake for testing
     if "snakemake" not in globals():
@@ -743,13 +771,16 @@ if __name__ == "__main__":
     if run != "":
         run += "/"
 
+    solvers = solver_labels(snakemake.config["solving"]["solver"])
+
     networks_dict = {
-        (clusters, opts + sector_opts): "results/"
+        (clusters, opts + sector_opts, solver): "results/"
         + run
-        + f"networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.nc"
+        + f"networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc"
         for clusters in snakemake.config["scenario"]["clusters"]
         for opts in snakemake.config["scenario"]["opts"]
         for sector_opts in snakemake.config["scenario"]["sector_opts"]
+        for solver in solvers
     }
 
     print(networks_dict)
@@ -758,6 +789,6 @@ if __name__ == "__main__":
 
     df = make_summaries(networks_dict)
 
-    df["metrics"].loc["total costs"] = df["costs"].sum().groupby(level=[0, 1]).sum()
+    df["metrics"].loc["total costs"] = df["costs"].sum().groupby(level=[0, 1, 2]).sum()
 
     to_csv(df)

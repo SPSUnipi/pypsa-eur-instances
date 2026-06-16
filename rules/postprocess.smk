@@ -6,7 +6,7 @@ def get_network(w):
     """Return the solved network used by post-processing rules."""
     network = (
         RESULTS
-        + f"networks/base_s_{w.clusters}_{w.opts}_{w.sector_opts}_{w.planning_horizons}.nc"
+        + f"networks/base_s_{w.clusters}_{w.opts}_{w.sector_opts}_{w.planning_horizons}_{w.solver}.nc"
     )
 
     if (
@@ -62,14 +62,14 @@ if config["foresight"] != "perfect":
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             map=RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-costs-all_{planning_horizons}.pdf",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-costs-all_{planning_horizons}_{solver}.pdf",
         log:
             RESULTS
-            + "logs/plot_power_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+            + "logs/plot_power_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/plot_power_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+                + "benchmarks/plot_power_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
             )
         threads: 2
         resources:
@@ -88,14 +88,14 @@ if config["foresight"] != "perfect":
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             map=RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-h2_network_{planning_horizons}.pdf",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-h2_network_{planning_horizons}_{solver}.pdf",
         log:
             RESULTS
-            + "logs/plot_hydrogen_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+            + "logs/plot_hydrogen_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/plot_hydrogen_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+                + "benchmarks/plot_hydrogen_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
             )
         threads: 2
         resources:
@@ -114,14 +114,14 @@ if config["foresight"] != "perfect":
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             map=RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-ch4_network_{planning_horizons}.pdf",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-ch4_network_{planning_horizons}_{solver}.pdf",
         log:
             RESULTS
-            + "logs/plot_gas_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+            + "logs/plot_gas_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/plot_gas_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+                + "benchmarks/plot_gas_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
             )
         threads: 2
         resources:
@@ -139,14 +139,14 @@ if config["foresight"] != "perfect":
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-balance_map_{carrier}.pdf",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-balance_map_{carrier}.pdf",
         log:
             RESULTS
-            + "logs/plot_balance_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{carrier}.log",
+            + "logs/plot_balance_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_{carrier}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/plot_balance_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{carrier}"
+                + "benchmarks/plot_balance_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_{carrier}"
             )
         threads: 1
         resources:
@@ -165,14 +165,14 @@ if config["foresight"] != "perfect":
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             RESULTS
-            + "maps/interactive/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-balance_map_{carrier}.html",
+            + "maps/interactive/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-balance_map_{carrier}.html",
         log:
             RESULTS
-            + "logs/plot_balance_map_interactive/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{carrier}.log",
+            + "logs/plot_balance_map_interactive/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_{carrier}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/plot_interactive_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{carrier}"
+                + "benchmarks/plot_interactive_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_{carrier}"
             )
         threads: 1
         resources:
@@ -205,16 +205,16 @@ if config["foresight"] != "perfect":
             ),
         output:
             temp_map=RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-heat_source_temperature_map_{carrier}.html",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-heat_source_temperature_map_{carrier}.html",
             energy_map=RESULTS
-            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}-heat_source_energy_map_{carrier}.html",
+            + "maps/static/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}-heat_source_energy_map_{carrier}.html",
         log:
             RESULTS
-            + "logs/plot_heat_source_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{carrier}.log",
+            + "logs/plot_heat_source_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_{carrier}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/plot_heat_source_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{carrier}"
+                + "benchmarks/plot_heat_source_map/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_{carrier}"
             )
         threads: 1
         resources:
@@ -232,14 +232,14 @@ if config["foresight"] == "perfect":
         return {
             f"map_{year}": RESULTS
             + "maps/static/base_s_{clusters}_{opts}_{sector_opts}-costs-all_"
-            + f"{year}.pdf"
+            + f"{year}_{w.solver}.pdf"
             for year in config_provider("scenario", "planning_horizons")(w)
         }
 
     rule plot_power_network_perfect:
         input:
             network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc",
             regions=resources("regions_onshore_base_s_{clusters}.geojson"),
         output:
             unpack(output_map_year),
@@ -254,45 +254,173 @@ if config["foresight"] == "perfect":
             scripts("plot_power_network_perfect.py")
 
 
+rule make_solver_comparison_elec:
+    input:
+        networks=lambda w: expand(
+            RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            solver=solver_names(w),
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            solver=solver_names(w),
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_elec_{opts}.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_elec_{opts}.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_elec_{opts}.csv",
+    log:
+        RESULTS + "logs/make_solver_comparison/base_s_{clusters}_elec_{opts}.log",
+    benchmark:
+        RESULTS + "benchmarks/make_solver_comparison/base_s_{clusters}_elec_{opts}"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved electricity networks across configured solvers for {wildcards.clusters} clusters and {wildcards.opts} electric options"
+    script:
+        scripts("compare_solver_results.py")
+
+
+rule make_solver_comparison_sector:
+    input:
+        networks=lambda w: expand(
+            RESULTS
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            planning_horizons=w.planning_horizons,
+            solver=solver_names(w),
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            planning_horizons=w.planning_horizons,
+            solver=solver_names(w),
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+    log:
+        RESULTS
+        + "logs/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved sector-coupled networks across configured solvers for {wildcards.clusters} clusters, {wildcards.planning_horizons} planning horizon, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+    script:
+        scripts("compare_solver_results.py")
+
+
+rule make_solver_comparison_sector_perfect:
+    input:
+        networks=lambda w: expand(
+            RESULTS
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            solver=solver_names(w),
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            solver=solver_names(w),
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+    log:
+        RESULTS
+        + "logs/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved perfect-foresight sector-coupled networks across configured solvers for {wildcards.clusters} clusters, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+    script:
+        scripts("compare_solver_results.py")
+
+
 rule make_summary:
     input:
         network=get_network,
     output:
         nodal_costs=RESULTS
-        + "csvs/individual/nodal_costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/nodal_costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         nodal_capacities=RESULTS
-        + "csvs/individual/nodal_capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/nodal_capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         nodal_capacity_factors=RESULTS
-        + "csvs/individual/nodal_capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/nodal_capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         capacity_factors=RESULTS
-        + "csvs/individual/capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         costs=RESULTS
-        + "csvs/individual/costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         capacities=RESULTS
-        + "csvs/individual/capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         curtailment=RESULTS
-        + "csvs/individual/curtailment_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/curtailment_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         energy=RESULTS
-        + "csvs/individual/energy_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/energy_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         energy_balance=RESULTS
-        + "csvs/individual/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         nodal_energy_balance=RESULTS
-        + "csvs/individual/nodal_energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/nodal_energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         prices=RESULTS
-        + "csvs/individual/prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         weighted_prices=RESULTS
-        + "csvs/individual/weighted_prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/weighted_prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         market_values=RESULTS
-        + "csvs/individual/market_values_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/market_values_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
         metrics=RESULTS
-        + "csvs/individual/metrics_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+        + "csvs/individual/metrics_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
     log:
         RESULTS
-        + "logs/make_summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+        + "logs/make_summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
     benchmark:
         (
             RESULTS
-            + "benchmarks/make_summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+            + "benchmarks/make_summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
         )
     threads: 1
     resources:
@@ -307,86 +435,100 @@ rule make_global_summary:
     input:
         nodal_costs=expand(
             RESULTS
-            + "csvs/individual/nodal_costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/nodal_costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         nodal_capacities=expand(
             RESULTS
-            + "csvs/individual/nodal_capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/nodal_capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         nodal_capacity_factors=expand(
             RESULTS
-            + "csvs/individual/nodal_capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/nodal_capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         capacity_factors=expand(
             RESULTS
-            + "csvs/individual/capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/capacity_factors_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         costs=expand(
             RESULTS
-            + "csvs/individual/costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/costs_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         capacities=expand(
             RESULTS
-            + "csvs/individual/capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/capacities_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         curtailment=expand(
             RESULTS
-            + "csvs/individual/curtailment_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/curtailment_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         energy=expand(
             RESULTS
-            + "csvs/individual/energy_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/energy_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         energy_balance=expand(
             RESULTS
-            + "csvs/individual/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         nodal_energy_balance=expand(
             RESULTS
-            + "csvs/individual/nodal_energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/nodal_energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         prices=expand(
             RESULTS
-            + "csvs/individual/prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         weighted_prices=expand(
             RESULTS
-            + "csvs/individual/weighted_prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/weighted_prices_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         market_values=expand(
             RESULTS
-            + "csvs/individual/market_values_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/market_values_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
         metrics=expand(
             RESULTS
-            + "csvs/individual/metrics_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+            + "csvs/individual/metrics_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.csv",
             **config["scenario"],
+            solver=solver_names(),
             allow_missing=True,
         ),
     output:
@@ -413,6 +555,7 @@ rule make_global_summary:
         mem_mb=8000,
     params:
         scenario=config_provider("scenario"),
+        solvers=solver_names,
         RDIR=RDIR,
     message:
         "Creating global summary of optimization results for all scenarios"
@@ -478,14 +621,14 @@ rule plot_balance_timeseries:
     output:
         directory(
             RESULTS
-            + "graphics/balance_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+            + "graphics/balance_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
         ),
     log:
         RESULTS
-        + "logs/plot_balance_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+        + "logs/plot_balance_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
     benchmark:
         RESULTS
-        + "benchmarks/plot_balance_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+        + "benchmarks/plot_balance_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
     threads: 16
     resources:
         mem_mb=10000,
@@ -506,14 +649,14 @@ rule plot_heatmap_timeseries:
     output:
         directory(
             RESULTS
-            + "graphics/heatmap_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+            + "graphics/heatmap_timeseries/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
         ),
     log:
         RESULTS
-        + "logs/plot_heatmap_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+        + "logs/plot_heatmap_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
     benchmark:
         RESULTS
-        + "benchmarks/plot_heatmap_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+        + "benchmarks/plot_heatmap_timeseries/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
     threads: 16
     resources:
         mem_mb=10000,
@@ -542,15 +685,15 @@ STATISTICS_BARPLOTS = [
 
 rule plot_base_statistics:
     input:
-        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}.nc",
+        network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
     output:
         **{
             f"{plot}_bar": RESULTS
-            + f"figures/statistics_{plot}_bar_base_s_{{clusters}}_elec_{{opts}}.pdf"
+            + f"figures/statistics_{plot}_bar_base_s_{{clusters}}_elec_{{opts}}_{{solver}}.pdf"
             for plot in STATISTICS_BARPLOTS
         },
         barplots_touch=RESULTS
-        + "figures/.statistics_plots_base_s_{clusters}_elec_{opts}",
+        + "figures/.statistics_plots_base_s_{clusters}_elec_{opts}_{solver}",
     params:
         plotting=config_provider("plotting"),
         barplots=STATISTICS_BARPLOTS,
@@ -604,14 +747,14 @@ rule plot_interactive_bus_balance:
     output:
         directory=directory(
             RESULTS
-            + "graphics/interactive_bus_balance/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+            + "graphics/interactive_bus_balance/s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
         ),
     log:
         RESULTS
-        + "logs/plot_interactive_bus_balance/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.log",
+        + "logs/plot_interactive_bus_balance/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.log",
     benchmark:
         RESULTS
-        + "benchmarks/plot_interactive_bus_balance/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+        + "benchmarks/plot_interactive_bus_balance/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
     resources:
         mem_mb=20000,
     params:

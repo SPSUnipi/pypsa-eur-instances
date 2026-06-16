@@ -250,13 +250,30 @@ class _ConstraintsConfig(BaseModel):
 class _SolverConfig(BaseModel):
     """Configuration for `solving.solver` settings."""
 
-    name: str = Field(
+    name: str | list[str] = Field(
         "gurobi",
-        description="Solver to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow.",
+        description="Solver or list of solvers to use for optimisation problems in the workflow; e.g. clustering and linear optimal power flow.",
     )
-    options: str = Field(
-        "gurobi-default", description="Link to specific parameter settings."
+    options: str | list[str] = Field(
+        "gurobi-default",
+        description="Solver option set or list of option sets paired with `name`.",
     )
+
+    @model_validator(mode="after")
+    def check_solver_option_pairs(self):
+        names = self.name if isinstance(self.name, list) else [self.name]
+        options = self.options if isinstance(self.options, list) else [self.options]
+
+        if not names:
+            raise ValueError("solving.solver.name must contain at least one solver.")
+        if not options:
+            raise ValueError("solving.solver.options must contain at least one option set.")
+        if len(options) not in (1, len(names)):
+            raise ValueError(
+                "solving.solver.options must either contain one option set or one "
+                "option set per entry in solving.solver.name."
+            )
+        return self
 
 
 class _CheckObjectiveConfig(BaseModel):
@@ -410,6 +427,18 @@ class SolvingConfig(BaseModel):
             },
             "cbc-default": {},
             "glpk-default": {},
+            "smspp-ucblock": {
+                "capacity_expansion_ucblock": True,
+            },
+            "smspp-investmentblock": {
+                "capacity_expansion_ucblock": False,
+            },
+            "smspp-stochastic": {
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewables"],
+                },
+            },
         },
         description="Dictionaries with solver-specific parameter settings.",
     )
