@@ -16,6 +16,8 @@ gurobi.log
 *.orig
 .idea
 
+screenlog*
+
 /bak
 /resources
 /resources*

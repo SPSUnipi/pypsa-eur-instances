@@ -1,0 +1,20 @@
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#run
+run:
+  prefix: "instances_unipi"
+  name: "IT-separated-elec"
+  scenarios:
+    enable: false
+    file: config/scenarios.yaml
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#scenario
+scenario:
+  clusters:
+  - 5
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#countries
+countries:
+- IT
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#clustering
+clustering:
+  exclude_carriers: [oil, CCGT, OCGT, coal, lignite, biomass]

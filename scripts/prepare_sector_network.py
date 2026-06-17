@@ -1315,6 +1315,41 @@ def cycling_shift(df, steps=1):
     df.values[:] = df.reindex(index=new_index).values
     return df
 
+def get_base_generators_to_keep_separate(
+    n: pypsa.Network,
+    exclude_carriers: list[str],
+    conventionals: dict[str, str],
+) -> pd.DataFrame:
+    """
+    Return conventional generators that should be converted to separate sector-coupled links.
+
+    Only carriers that are both listed in clustering.exclude_carriers and present in
+    sector.conventional_generation are considered. This avoids accidentally converting
+    renewable or hydro carriers through this path.
+    """
+    if not exclude_carriers:
+        return pd.DataFrame(columns=n.generators.columns)
+
+    separate_carriers = set(exclude_carriers) & set(conventionals)
+
+    if not separate_carriers:
+        return pd.DataFrame(columns=n.generators.columns)
+
+    generators = n.generators[n.generators.carrier.isin(separate_carriers)].copy()
+
+    if generators.empty:
+        logger.warning(
+            "No base electricity generators found for separated carriers: "
+            + ", ".join(sorted(separate_carriers))
+        )
+    else:
+        logger.info(
+            "Keeping the following base electricity generator carriers separated "
+            "when converting them to sector-coupled links: "
+            + ", ".join(sorted(separate_carriers))
+        )
+
+    return generators
 
 def add_generation(
     n: pypsa.Network,
@@ -1324,49 +1359,32 @@ def add_generation(
     spatial: SimpleNamespace,
     options: dict,
     cf_industry: dict,
+    separate_generators: pd.DataFrame | None = None,
 ) -> None:
     """
-    Add conventional electricity generation to the network.
+    Add conventional electricity generation to the sector-coupled network.
 
-    Creates links between carrier buses and demand nodes for conventional generators,
-    including their efficiency, costs, and CO2 emissions.
-
-    Parameters
-    ----------
-    n : pypsa.Network
-        The PyPSA network container object
-    costs : pd.DataFrame
-        DataFrame containing cost and technical parameters for different technologies
-    pop_layout : pd.DataFrame
-        DataFrame with population layout data, used for demand nodes
-    conventionals : Dict[str, str]
-        Dictionary mapping generator types to their energy carriers
-        e.g., {'OCGT': 'gas', 'CCGT': 'gas', 'coal': 'coal'}
-    spatial : SimpleNamespace
-        Namespace containing spatial information for different carriers,
-        including nodes and locations
-    options : dict
-        Configuration dictionary containing settings for the model
-    cf_industry : dict
-        Dictionary of industrial conversion factors, needed for carrier buses
-
-    Returns
-    -------
-    None
-        Modifies the network object in-place by adding generation components
-
-    Notes
-    -----
-    - Costs (VOM and fixed) are given per MWel and automatically adjusted by efficiency
-    - CO2 emissions are tracked through a link to the 'co2 atmosphere' bus
-    - Generator lifetimes are considered in the capital cost calculation
+    By default, conventional generators are added as one extendable Link per
+    electricity node and technology. If a carrier is listed in
+    clustering.exclude_carriers, the corresponding base electricity Generators
+    are instead converted one-by-one into separate Links.
     """
     logger.info("Adding electricity generation")
 
     nodes = pop_layout.index
 
+    if separate_generators is None:
+        separate_generators = pd.DataFrame(columns=n.generators.columns)
+
+    separated_carriers = (
+        set(separate_generators.carrier.unique())
+        if not separate_generators.empty
+        else set()
+    )
+
     for generator, carrier in conventionals.items():
-        carrier_nodes = vars(spatial)[carrier].nodes
+        carrier_space = vars(spatial)[carrier]
+        carrier_nodes = carrier_space.nodes
 
         add_carrier_buses(
             n=n,
@@ -1377,16 +1395,66 @@ def add_generation(
             cf_industry=cf_industry,
         )
 
+        if generator in separated_carriers:
+            gens = separate_generators.query("carrier == @generator").copy()
+
+            if gens.empty:
+                continue
+
+            # In PyPSA Links, p_nom limits bus0 flow. Since the original
+            # Generator p_nom is electrical output, divide by efficiency.
+            efficiency = costs.at[generator, "efficiency"]
+
+            link_attrs = {
+                "bus0": gens.bus.map(carrier_space.df["nodes"]),
+                "bus1": gens.bus,
+                "bus2": "co2 atmosphere",
+                "marginal_cost": efficiency * costs.at[generator, "VOM"],
+                "capital_cost": efficiency * costs.at[generator, "capital_cost"],
+                "carrier": generator,
+                "efficiency": efficiency,
+                "efficiency2": costs.at[carrier, "CO2 intensity"],
+                "lifetime": costs.at[generator, "lifetime"],
+            }
+
+            if "p_nom" in gens:
+                link_attrs["p_nom"] = gens.p_nom / efficiency
+
+            if "p_nom_min" in gens:
+                link_attrs["p_nom_min"] = gens.p_nom_min / efficiency
+
+            if "p_nom_max" in gens:
+                p_nom_max = gens.p_nom_max.replace(np.inf, np.nan) / efficiency
+                link_attrs["p_nom_max"] = p_nom_max.where(p_nom_max.notna(), np.inf)
+
+            if "p_nom_extendable" in gens:
+                link_attrs["p_nom_extendable"] = gens.p_nom_extendable
+
+            if "build_year" in gens:
+                link_attrs["build_year"] = gens.build_year
+
+            logger.info(
+                f"Converting {len(gens)} separated {generator} generators "
+                "to sector-coupled links."
+            )
+
+            n.add(
+                "Link",
+                gens.index,
+                **link_attrs,
+            )
+
+            continue
+
         n.add(
             "Link",
             nodes + " " + generator,
             bus0=carrier_nodes,
             bus1=nodes,
             bus2="co2 atmosphere",
-            marginal_cost=costs.at[generator, "efficiency"]
-            * costs.at[generator, "VOM"],  # NB: VOM is per MWel
+            marginal_cost=costs.at[generator, "efficiency"] * costs.at[generator, "VOM"],
             capital_cost=costs.at[generator, "efficiency"]
-            * costs.at[generator, "capital_cost"],  # NB: fixed cost is per MWel
+            * costs.at[generator, "capital_cost"],
             p_nom_extendable=True,
             carrier=generator,
             efficiency=costs.at[generator, "efficiency"],
@@ -6297,16 +6365,25 @@ if __name__ == "__main__":
     gas_input_nodes = pd.read_csv(fn, index_col=0)
 
     carriers_to_keep = snakemake.params.pypsa_eur
+
+    separate_generators = get_base_generators_to_keep_separate(
+        n=n,
+        exclude_carriers=snakemake.params.exclude_carriers,
+        conventionals=snakemake.params.sector["conventional_generation"],
+    )
+
     profiles = {
         key: snakemake.input[key]
         for key in snakemake.input.keys()
         if key.startswith("profile")
     }
+
     landfall_lengths = {
         tech: settings["landfall_length"]
         for tech, settings in snakemake.params.renewable.items()
         if "landfall_length" in settings.keys()
     }
+
     patch_electricity_network(n, costs, carriers_to_keep, profiles, landfall_lengths)
 
     fn = snakemake.input.heating_efficiencies
@@ -6353,6 +6430,7 @@ if __name__ == "__main__":
         spatial=spatial,
         options=options,
         cf_industry=cf_industry,
+        separate_generators=separate_generators,
     )
 
     add_h2_gas_infrastructure(
