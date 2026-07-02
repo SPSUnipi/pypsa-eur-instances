@@ -2,10 +2,10 @@
 
 run:
   prefix: "instances_unipi"
-  name: "IT-elec"
+  name: all
   scenarios:
-    enable: false
-    file: config/scenarios.yaml
+    enable: true
+    file: config/performance_instances/scenarios_power-IT-dispatch.yaml
   disable_progressbar: true
   shared_resources:
     policy: false
@@ -25,12 +25,21 @@ scenario:
 countries:
 - IT
 
+electricity:
+  extendable_carriers:
+    Generator: []
+    StorageUnit: []
+    Store: []
+    Link: []
+
 clustering:
   temporal:
-    resolution_elec: 4c24
+    resolution_elec: 48c24
 
 solving:
   options:
+    load_shedding: 
+      enable: true
     skip_iterations: true
     transmission_losses: 0
     linearized_unit_commitment: false

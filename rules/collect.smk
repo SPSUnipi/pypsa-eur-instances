@@ -80,6 +80,17 @@ rule solve_elec_networks:
 
 
 def electricity_solver_comparison_paths(w):
+    if config["run"]["scenarios"]["enable"] and "run" not in w.keys():
+        paths = []
+        for run in ensure_list(config["run"]["name"]):
+            paths += expand(
+                RESULTS + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}.csv",
+                clusters=scenario_config(run)["scenario"]["clusters"],
+                opts=scenario_config(run)["scenario"]["opts"],
+                run=run,
+            )
+        return paths
+
     return expand(
         RESULTS + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}.csv",
         clusters=config_provider("scenario", "clusters")(w),
@@ -88,6 +99,31 @@ def electricity_solver_comparison_paths(w):
 
 
 def sector_solver_comparison_paths(w):
+    if config["run"]["scenarios"]["enable"] and "run" not in w.keys():
+        paths = []
+        for run in ensure_list(config["run"]["name"]):
+            run_config = scenario_config(run)
+            if run_config["foresight"] == "perfect":
+                paths += expand(
+                    RESULTS
+                    + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years.csv",
+                    clusters=run_config["scenario"]["clusters"],
+                    opts=run_config["scenario"]["opts"],
+                    sector_opts=run_config["scenario"]["sector_opts"],
+                    run=run,
+                )
+            else:
+                paths += expand(
+                    RESULTS
+                    + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.csv",
+                    clusters=run_config["scenario"]["clusters"],
+                    opts=run_config["scenario"]["opts"],
+                    sector_opts=run_config["scenario"]["sector_opts"],
+                    planning_horizons=run_config["scenario"]["planning_horizons"],
+                    run=run,
+                )
+        return paths
+
     if config_provider("foresight")(w) == "perfect":
         return expand(
             RESULTS

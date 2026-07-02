@@ -1,0 +1,49 @@
+
+lin_24c24:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+
+uc_24c24:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  conventional:
+    unit_commitment: true
+
+lin_48c24:
+  clustering:
+    temporal:
+      resolution_elec: 48c24
+
+uc_48c24:
+  clustering:
+    temporal:
+      resolution_elec: 48c24
+  conventional:
+    unit_commitment: true
+
+lin_168c24:
+  clustering:
+    temporal:
+      resolution_elec: 168c24
+
+uc_168c24:
+  clustering:
+    temporal:
+      resolution_elec: 168c24
+  conventional:
+    unit_commitment: true
+
+lin_8760:
+  clustering:
+    temporal:
+      resolution_elec: 1H
+
+uc_8760:
+  clustering:
+    temporal:
+      resolution_elec: 1H
+  conventional:
+    unit_commitment: true
+
