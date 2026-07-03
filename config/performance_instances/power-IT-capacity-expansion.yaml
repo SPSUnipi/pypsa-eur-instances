@@ -25,14 +25,6 @@ scenario:
 countries:
 - IT
 
-electricity:
-  extendable_carriers:
-    Generator: []
-    StorageUnit: []
-    Store: []
-    Link: []
-  transmission_limit: v1.0
-
 clustering:
   temporal:
     resolution_elec: 48c24
