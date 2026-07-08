@@ -262,6 +262,7 @@ rule make_solver_comparison_elec:
             opts=w.opts,
             run=w.run if "run" in w.keys() else config["run"]["name"],
             solver=solver_names(w),
+            run=config["run"]["name"],
         ),
         benchmarks=lambda w: expand(
             RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}",
@@ -269,6 +270,7 @@ rule make_solver_comparison_elec:
             opts=w.opts,
             run=w.run if "run" in w.keys() else config["run"]["name"],
             solver=solver_names(w),
+            run=config["run"]["name"],
         ),
     output:
         summary=RESULTS
@@ -305,6 +307,7 @@ rule make_solver_comparison_sector:
             planning_horizons=w.planning_horizons,
             run=w.run if "run" in w.keys() else config["run"]["name"],
             solver=solver_names(w),
+            run=config["run"]["name"],
         ),
         benchmarks=lambda w: expand(
             RESULTS
@@ -315,6 +318,7 @@ rule make_solver_comparison_sector:
             planning_horizons=w.planning_horizons,
             run=w.run if "run" in w.keys() else config["run"]["name"],
             solver=solver_names(w),
+            run=config["run"]["name"],
         ),
     output:
         summary=RESULTS
@@ -352,6 +356,7 @@ rule make_solver_comparison_sector_perfect:
             sector_opts=w.sector_opts,
             run=w.run if "run" in w.keys() else config["run"]["name"],
             solver=solver_names(w),
+            run=config["run"]["name"],
         ),
         benchmarks=lambda w: expand(
             RESULTS
@@ -361,6 +366,7 @@ rule make_solver_comparison_sector_perfect:
             sector_opts=w.sector_opts,
             run=w.run if "run" in w.keys() else config["run"]["name"],
             solver=solver_names(w),
+            run=config["run"]["name"],
         ),
     output:
         summary=RESULTS

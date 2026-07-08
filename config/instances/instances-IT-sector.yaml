@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=schema.default.json
 
 run:
-  prefix: "instances_unipi"
+  prefix: "instances"
   name: "IT-sector"
   scenarios:
     enable: false
