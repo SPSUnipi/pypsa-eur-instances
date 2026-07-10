@@ -130,3 +130,4 @@ uc_8760:
         capacity_expansion_ucblock: false
         enable_thermal_units: true
     runtime: 12H
+    

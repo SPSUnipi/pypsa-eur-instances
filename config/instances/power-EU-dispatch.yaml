@@ -54,3 +54,4 @@ solving:
     smspp-investmentblock:
       capacity_expansion_ucblock: false
   runtime: 12H
+  
