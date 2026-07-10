@@ -5,7 +5,7 @@ run:
   name: all
   scenarios:
     enable: true
-    file: config/performance_instances/scenarios/scenarios-power.yaml
+    file: config/instances/scenarios/scenarios-power.yaml
   disable_progressbar: true
   shared_resources:
     policy: false
