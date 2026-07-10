@@ -52,26 +52,26 @@ rule solve_sector_network:
         ),
     output:
         network=RESULTS
-        + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+        + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
         config=RESULTS
-        + "configs/config.base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.yaml",
+        + "configs/config.base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.yaml",
         model=(
             RESULTS
-            + "models/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc"
+            + "models/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc"
             if config["solving"]["options"]["store_model"]
             else []
         ),
     log:
         solver=RESULTS
-        + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_solver.log",
+        + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_solver.log",
         memory=RESULTS
-        + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_memory.log",
+        + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_memory.log",
         python=RESULTS
-        + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_python.log",
+        + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_python.log",
     benchmark:
         (
             RESULTS
-            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}"
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}"
         )
     shadow:
         shadow_config
@@ -80,14 +80,14 @@ rule solve_sector_network:
         mem_mb=config_provider("solving", "mem_mb"),
         runtime=config_provider("solving", "runtime", default="6h"),
     params:
-        solving=config_provider("solving"),
+        solving=solving_for_solver,
         foresight=config_provider("foresight"),
         co2_sequestration_potential=config_provider(
             "sector", "co2_sequestration_potential", default=200
         ),
         custom_extra_functionality=input_custom_extra_functionality,
     message:
-        "Solving stochastic sector-coupled network with overnight investment optimization for {wildcards.clusters} clusters, {wildcards.planning_horizons} planning horizons, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+        "Solving stochastic sector-coupled network with overnight investment optimization using {wildcards.solver} for {wildcards.clusters} clusters, {wildcards.planning_horizons} planning horizons, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
     script:
         scripts("solve_network.py")
 
@@ -97,17 +97,17 @@ if config["stochastic_scenarios"]["export"]["average"]:
     rule export_stochastic_average:
         input:
             network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
         output:
             network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__avg.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__avg.nc",
         log:
             python=RESULTS
-            + "logs/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__avg.log",
+            + "logs/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__avg.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__avg"
+                + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__avg"
             )
         threads: 1
         resources:
@@ -126,17 +126,17 @@ if config["stochastic_scenarios"]["export"]["scenarios"]:
     rule export_stochastic_scenario:
         input:
             network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
         output:
             network=RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__sc-{stoch_scenario}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__sc-{stoch_scenario}.nc",
         log:
             python=RESULTS
-            + "logs/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__sc-{stoch_scenario}.log",
+            + "logs/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__sc-{stoch_scenario}.log",
         benchmark:
             (
                 RESULTS
-                + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__sc-{stoch_scenario}"
+                + "benchmarks/export_stochastic_views/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__sc-{stoch_scenario}"
             )
         wildcard_constraints:
             stoch_scenario=STOCHASTIC_SCENARIO_PATTERN,

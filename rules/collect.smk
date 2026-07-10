@@ -11,6 +11,7 @@ localrules:
     solve_elec_networks,
     compare_solver_elec_outputs,
     compare_solver_sector_outputs,
+    compare_solver_tssb_outputs,
     solve_sector_networks,
 
 
@@ -110,6 +111,18 @@ def sector_solver_comparison_paths(w):
     )
 
 
+def tssb_solver_comparison_paths(w):
+    return expand(
+        RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.csv",
+        clusters=config_provider("scenario", "clusters")(w),
+        opts=config_provider("scenario", "opts")(w),
+        sector_opts=config_provider("scenario", "sector_opts")(w),
+        planning_horizons=config_provider("scenario", "planning_horizons")(w),
+        run=config["run"]["name"],
+    )
+
+
 rule compare_solver_elec_outputs:
     input:
         electricity_solver_comparison_paths,
@@ -122,6 +135,13 @@ rule compare_solver_sector_outputs:
         sector_solver_comparison_paths,
     message:
         "Collecting sector-coupled solver comparison files"
+
+
+rule compare_solver_tssb_outputs:
+    input:
+        tssb_solver_comparison_paths,
+    message:
+        "Collecting stochastic TSSB solver comparison files"
 
 
 rule solve_sector_networks:
@@ -152,10 +172,11 @@ rule solve_stochastic_networks:
     input:
         expand(
             RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}__sc-{stoch_scenario}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__sc-{stoch_scenario}.nc",
             **config["scenario"],
             stoch_scenario=STOCHASTIC_SCENARIOS,
             run=config["run"]["name"],
+            solver=solver_names(),
         ),
     message:
         "Solving stochastic network problems"
@@ -164,10 +185,10 @@ rule solve_stochastic_average_networks:
     input:
         expand(
             RESULTS
-            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc",
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}__avg.nc",
             **config["scenario"],
-            stoch_scenario=STOCHASTIC_SCENARIOS,
             run=config["run"]["name"],
+            solver=solver_names(),
         ),
     message:
         "Solving stochastic network problems"

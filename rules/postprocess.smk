@@ -342,6 +342,54 @@ rule make_solver_comparison_sector:
         scripts("compare_solver_results.py")
 
 
+rule make_solver_comparison_tssb:
+    input:
+        networks=lambda w: expand(
+            RESULTS
+            + "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            planning_horizons=w.planning_horizons,
+            solver=solver_names(w),
+            run=config["run"]["name"],
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS
+            + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            sector_opts=w.sector_opts,
+            planning_horizons=w.planning_horizons,
+            solver=solver_names(w),
+            run=config["run"]["name"],
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.csv",
+    log:
+        RESULTS
+        + "logs/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/make_solver_comparison/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved stochastic TSSB networks across configured solvers for {wildcards.clusters} clusters, {wildcards.planning_horizons} planning horizon, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
+    script:
+        scripts("compare_solver_results.py")
+
+
 rule make_solver_comparison_sector_perfect:
     input:
         networks=lambda w: expand(

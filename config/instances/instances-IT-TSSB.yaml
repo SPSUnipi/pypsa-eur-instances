@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../schema.default.json
+
+run:
+  prefix: "instances-IT-TSSB"
+  name: all
+  disable_progressbar: true
+  shared_resources:
+    policy: false
+    exclude: []
+  use_shadow_directory: false
+
+foresight: overnight
+
+scenario:
+  clusters:
+  - 5
+  opts:
+  - ''
+  sector_opts:
+  - ''
+  planning_horizons:
+  - 2050
+
+countries:
+- IT
+
+snapshots:
+  start: "2013-03-01"
+  end: "2013-03-08"
+
+stochastic_scenarios:
+  enable: true
+  file: config/instances/scenarios/stochastic-renewable-maxpower.yaml
+  export:
+    average: true
+    scenarios: true
+  postprocess:
+    use_average: false
+    scenarios: false
+
+electricity:
+  extendable_carriers:
+    Generator:
+    - solar
+    - "solar-hsat"
+    - onwind
+    - "offwind-ac"
+    - "offwind-dc"
+    - "offwind-float"
+    - OCGT
+    - CCGT
+    StorageUnit: []
+    Store:
+    - battery
+    - H2
+    Link: []
+  renewable_carriers:
+  - solar
+  - "solar-hsat"
+  - onwind
+  - "offwind-ac"
+  - "offwind-dc"
+  - "offwind-float"
+  - hydro
+
+clustering:
+  temporal:
+    resolution_elec: 3H
+
+solving:
+  options:
+    load_shedding:
+      enable: true
+    skip_iterations: true
+    transmission_losses: 0
+    linearized_unit_commitment: false
+    noisy_costs: false
+  solver:
+    name: [gurobi, smspp]
+    options: [gurobi-default, smspp-tssb]
+  solver_options:
+    "smspp-tssb":
+      stochastic_parameters:
+        stochastic_type: tssb
+        capacity_expansion_ucblock: true
+        configfile: "TSSB/tssb_solverconfig_grb.txt"
+        parameters:
+        - renewable_maxpower
+  mem_mb: 4000
+  runtime: 12H

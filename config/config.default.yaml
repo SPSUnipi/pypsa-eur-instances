@@ -1287,12 +1287,19 @@ solving:
       capacity_expansion_ucblock: true
     "smspp-investmentblock":
       capacity_expansion_ucblock: false
-    "smspp-stochastic":
+    "smspp-tssb":
       stochastic_parameters:
         stochastic_type: tssb
+        capacity_expansion_ucblock: true
         parameters:
         - demand
-        - renewables
+        # - renewable_maxpower
+        # - renewable_marginal_cost
+        # - hydro_inflow
+        # - thermal_stand_by_cost
+        # - thermal_marginal_cost
+        # - thermal_marginal_cost_quadratic
+
   check_objective:
     enable: false
     expected_value:

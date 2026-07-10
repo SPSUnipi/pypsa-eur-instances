@@ -1,0 +1,57 @@
+scenarios:
+  renewable_low:
+    prob: 0.3333333333
+    structured_scenario:
+      name: modify_components
+      params:
+        rules:
+        - component: Generator
+          attribute: p_max_pu
+          target: static
+          carrier:
+          - solar
+          - solar-hsat
+          - onwind
+          - offwind-ac
+          - offwind-dc
+          - offwind-float
+          operation: scale
+          value: 0.5
+
+  renewable_mid:
+    prob: 0.3333333334
+    structured_scenario:
+      name: modify_components
+      params:
+        rules:
+        - component: Generator
+          attribute: p_max_pu
+          target: static
+          carrier:
+          - solar
+          - solar-hsat
+          - onwind
+          - offwind-ac
+          - offwind-dc
+          - offwind-float
+          operation: scale
+          value: 1.0
+
+  renewable_high:
+    prob: 0.3333333333
+    structured_scenario:
+      name: modify_components
+      params:
+        rules:
+        - component: Generator
+          attribute: p_max_pu
+          target: static
+          carrier:
+          - solar
+          - solar-hsat
+          - onwind
+          - offwind-ac
+          - offwind-dc
+          - offwind-float
+          operation: scale
+          value: 1.2
