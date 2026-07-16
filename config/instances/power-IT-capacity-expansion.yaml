@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=schema.default.json
 
 run:
-  prefix: "dispatch-power-IT"
-  name: all
+  prefix: "capacity-expansion-power-IT"
+  name: uc_24c24
   scenarios:
     enable: true
     file: config/instances/scenarios/scenarios-power.yaml
@@ -17,8 +17,8 @@ foresight: overnight
 scenario:
   clusters:
   - 2
-  - 20
-  - 50
+  #- 20
+  #- 50
   opts:
   - ''
 
@@ -46,5 +46,5 @@ solving:
       configfile: "UCBlock/uc_solverconfig_grb.txt"
     smspp-investmentblock:
       capacity_expansion_ucblock: false
-  runtime: 12H
+  runtime: 1H
   
