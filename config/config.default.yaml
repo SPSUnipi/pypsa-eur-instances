@@ -1286,16 +1286,20 @@ solving:
     "smspp-ucblock":
       capacity_expansion_ucblock: true
       configfile: config/smspp/UCBlockGrb/uc_solverconfig.txt
-    "smspp-unitcommitment-dispatch":
+    "smspp-investmentblock":
+      capacity_expansion_ucblock: false
+      configfile: config/smspp/InvestmentBlockGrb/BSPar.txt
+    "smspp-unitcommitment-dispatch-ucblock":
       capacity_expansion_ucblock: true
       enable_thermal_units: true
       configfile: config/smspp/UCBlockGrb/uc_solverconfig.txt
-    "smspp-unitcommitment-capacity-expansion":
+    "smspp-unitcommitment-dispatch-investmentblock":
       capacity_expansion_ucblock: false
       enable_thermal_units: true
       configfile: config/smspp/InvestmentBlockGrb/BSPar.txt
-    "smspp-investmentblock":
+    "smspp-unitcommitment-capacity-expansion":
       capacity_expansion_ucblock: false
+      enable_thermal_units: true
       configfile: config/smspp/InvestmentBlockGrb/BSPar.txt
     "smspp-ucblock-DP":
       capacity_expansion_ucblock: false
