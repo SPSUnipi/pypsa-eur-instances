@@ -59,4 +59,3 @@ solving:
       configfile: "config/smspp/Thermal_DynamicProgramming/TUBSCfg-DP.txt"
       pysmspp_options:
         "B": "config/smspp/Thermal_DynamicProgramming/TUBCfg-DP.txt"
-  runtime: 12H
