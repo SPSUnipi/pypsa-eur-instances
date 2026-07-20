@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=schema.default.json
 
 run:
-  prefix: "capacity-expansion-sector-EU-linear"
+  prefix: "capacity-expansion-sector-EU-UC"
   name: all
   scenarios:
     enable: true
@@ -130,6 +130,5 @@ solving:
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-ucblock, smspp-investmentblock]
-
+    name: [gurobi, smspp]
+    options: [gurobi-default, smspp-unitcommitment-capacity-expansion]

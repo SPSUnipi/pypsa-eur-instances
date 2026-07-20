@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=schema.default.json
 
 run:
-  prefix: "dispatch-power-IT-uc"
+  prefix: "dispatch-power-IT-UC"
   name: all
   scenarios:
     enable: true
