@@ -1306,7 +1306,7 @@ solving:
       enable_thermal_units: true
       configfile: "config/smspp/Thermal_DynamicProgramming/TUBSCfg-DP.txt"
       pysmspp_options:
-        "B": "config/smspp/Thermal_DynamicProgramming/TUBCfg-DP.txt"
+        B: "config/smspp/Thermal_DynamicProgramming/TUBCfg-DP.txt"
     "smspp-tssb":
       capacity_expansion_ucblock: true
       configfile: config/smspp/TSSBlock/TSSBCfg_grb.txt

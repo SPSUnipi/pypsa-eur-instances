@@ -50,5 +50,5 @@ solving:
     noisy_costs: false
   solver:
     name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-unitcommitment-dispatch, smspp-unitcommitment-dispatch-investmentblock]
+    options: [gurobi-default, smspp-unitcommitment-dispatch-ucblock, smspp-unitcommitment-dispatch-investmentblock]
 
