@@ -11,7 +11,6 @@ localrules:
     solve_elec_networks,
     compare_solver_elec_outputs,
     compare_solver_sector_outputs,
-    collect_solve_benchmarks,
     solve_sector_networks,
 
 
@@ -123,36 +122,6 @@ rule compare_solver_sector_outputs:
         sector_solver_comparison_paths,
     message:
         "Collecting sector-coupled solver comparison files"
-
-
-def benchmark_collection_root():
-    prefix = config["run"].get("prefix", "").strip("/")
-    if prefix:
-        return f"results/{prefix}"
-    return "results"
-
-
-def collected_solve_benchmark_path():
-    return benchmark_collection_root() + "/csvs/solve_benchmarks.csv"
-
-
-rule collect_solve_benchmarks:
-    output:
-        benchmarks=collected_solve_benchmark_path(),
-    log:
-        benchmark_collection_root() + "/logs/collect_solve_benchmarks.log",
-    benchmark:
-        benchmark_collection_root() + "/benchmarks/collect_solve_benchmarks"
-    threads: 1
-    resources:
-        mem_mb=1000,
-    params:
-        benchmark_root=benchmark_collection_root(),
-        solver_specs=solver_run_specs,
-    message:
-        "Collecting solve benchmark files below {params.benchmark_root}"
-    script:
-        scripts("collect_solve_benchmarks.py")
 
 
 rule solve_sector_networks:

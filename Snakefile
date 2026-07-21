@@ -191,7 +191,6 @@ rule all:
         ),
         lambda w: electricity_solver_comparison_paths(w)
         + sector_solver_comparison_paths(w),
-        collected_solve_benchmark_path(),
         # COP profiles plots
         expand(
             RESULTS + "graphs/cop_profiles_s_{clusters}_{planning_horizons}.html",
