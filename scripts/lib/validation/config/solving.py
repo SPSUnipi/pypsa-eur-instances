@@ -368,6 +368,7 @@ class SolvingConfig(BaseModel):
                 "PreDual": 0,
                 "GURO_PAR_BARDENSETHRESH": 200,
                 "IISMethod": 1,
+                "TimeLimit": 43200,
             },
             "gurobi-numeric-focus": {
                 "NumericFocus": 3,
