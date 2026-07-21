@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=schema.default.json
 
 run:
-  prefix: "capacity-expansion-power-IT"
-  name: uc_24c24
+  prefix: "dispatch-power-IT-noUC"
+  name: all
   scenarios:
     enable: true
     file: config/instances/scenarios/scenarios-power.yaml
@@ -17,13 +17,21 @@ foresight: overnight
 scenario:
   clusters:
   - 2
-  #- 20
-  #- 50
+  - 20
+  - 50
   opts:
   - ''
 
 countries:
 - IT
+
+electricity:
+  extendable_carriers:
+    Generator: []
+    StorageUnit: []
+    Store: []
+    Link: []
+  transmission_limit: v1.0
 
 clustering:
   temporal:
@@ -40,11 +48,3 @@ solving:
   solver:
     name: [gurobi, smspp, smspp]
     options: [gurobi-default, smspp-ucblock, smspp-investmentblock]
-  solver_options:
-    smspp-ucblock:
-      capacity_expansion_ucblock: true
-      configfile: "UCBlock/uc_solverconfig_grb.txt"
-    smspp-investmentblock:
-      capacity_expansion_ucblock: false
-  runtime: 1H
-  

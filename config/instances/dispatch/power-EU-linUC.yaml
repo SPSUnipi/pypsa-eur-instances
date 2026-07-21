@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=schema.default.json
 
 run:
-  prefix: "dispatch-power-EU"
+  prefix: "dispatch-power-EU-linUC"
   name: all
   scenarios:
     enable: true
@@ -36,22 +36,17 @@ clustering:
   temporal:
     resolution_elec: 48c24
 
+conventional:
+  unit_commitment: true
+
 solving:
   options:
     load_shedding: 
       enable: true
     skip_iterations: true
     transmission_losses: 0
-    linearized_unit_commitment: false
+    linearized_unit_commitment: true
     noisy_costs: false
   solver:
     name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-ucblock, smspp-investmentblock]
-  solver_options:
-    smspp-ucblock:
-      capacity_expansion_ucblock: true
-      configfile: "UCBlock/uc_solverconfig_grb.txt"
-    smspp-investmentblock:
-      capacity_expansion_ucblock: false
-  runtime: 12H
-  
+    options: [gurobi-default, smspp-unitcommitment-dispatch-ucblock, smspp-unitcommitment-dispatch-investmentblock]
