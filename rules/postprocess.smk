@@ -261,14 +261,14 @@ rule make_solver_comparison_elec:
             clusters=w.clusters,
             opts=w.opts,
             solver=solver_names(w),
-            run=config["run"]["name"],
+            run=w.run,
         ),
         benchmarks=lambda w: expand(
             RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}",
             clusters=w.clusters,
             opts=w.opts,
             solver=solver_names(w),
-            run=config["run"]["name"],
+            run=w.run,
         ),
     output:
         summary=RESULTS
