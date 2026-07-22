@@ -1,12 +1,15 @@
 # SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
 #
 # SPDX-License-Identifier: MIT
-"""Collect solve benchmarks and objectives below one or more results prefixes."""
+"""Collect solve benchmarks and objectives below one or more results prefixes.
+  python scripts/collect_solve_benchmarks.py \
+    --prefix dispatch-power-IT \
+    --output results/solve_benchmarks.csv
+"""
 
 import argparse
 import json
 import logging
-import re
 from pathlib import Path
 
 import pandas as pd
@@ -91,80 +94,10 @@ def read_benchmark(path: Path) -> dict:
     return {key: pd.NA if value == "NA" else value for key, value in benchmark.items()}
 
 
-STATUS_RE = re.compile(
-    r"Solving status ['\"](?P<status>[^'\"]+)['\"] "
-    r"with termination condition ['\"](?P<condition>[^'\"]+)['\"]",
-    re.IGNORECASE,
-)
-TERMINATION_RE = re.compile(
-    r"(?:termination condition|termination status|model status)\s*[:=]\s*"
-    r"(?P<condition>[A-Za-z_ -]+)", re.IGNORECASE
-)
-INFEASIBLE_RE = re.compile(r"\binfeasible\b", re.IGNORECASE)
-TIME_LIMIT_RE = re.compile(
-    r"\b(?:time[_ -]?limit|timelimit|max(?:imum)? time)\b", re.IGNORECASE
-)
-
-
 def result_directory(path: Path) -> Path:
     """Return the directory containing the benchmarks and networks folders."""
     benchmark_index = path.parts.index("benchmarks")
     return Path(*path.parts[:benchmark_index])
-
-
-def solve_log_files(result_dir: Path, stem: str) -> list[Path]:
-    logs = result_dir / "logs"
-    return sorted({
-        *logs.glob(f"**/{stem}_python.log"),
-        *logs.glob(f"**/{stem}_solver.log"),
-    })
-
-
-def read_solve_status(result_dir: Path, stem: str, network_exists: bool) -> dict:
-    """Infer solve outcome from Python/solver logs, including failed solves."""
-    log_files = solve_log_files(result_dir, stem)
-    text = "\n".join(p.read_text(errors="replace") for p in log_files)
-    status_matches = list(STATUS_RE.finditer(text))
-    status_match = status_matches[-1] if status_matches else None
-    termination_matches = list(TERMINATION_RE.finditer(text))
-    condition = (
-        status_match.group("condition").strip()
-        if status_match
-        else (
-            termination_matches[-1].group("condition").strip()
-            if termination_matches
-            else None
-        )
-    )
-    infeasible = bool(INFEASIBLE_RE.search(condition or "")) or bool(
-        re.search(r"Solving status ['\"]infeasible", text, re.IGNORECASE)
-    )
-    time_limit = bool(TIME_LIMIT_RE.search(condition or "")) or bool(
-        re.search(
-            r"(?:time limit reached|stopped on time|maximum time exceeded)",
-            text,
-            re.IGNORECASE,
-        )
-    )
-    if status_match:
-        status = status_match.group("status").strip()
-    elif infeasible:
-        status = "infeasible"
-    elif time_limit:
-        status = "warning"
-    elif network_exists:
-        status = "ok"
-        condition = condition or "optimal"
-    else:
-        status = "failed"
-        condition = condition or "unknown"
-    return {
-        "solve_status": status,
-        "termination_condition": condition or pd.NA,
-        "infeasible": infeasible,
-        "time_limit_reached": time_limit,
-        "solve_log_files": ";".join(p.as_posix() for p in log_files) or pd.NA,
-    }
 
 
 def read_network_metadata(path: Path) -> dict:
@@ -211,7 +144,6 @@ def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
                 "benchmark_rule": path.parent.name,
                 "benchmark_file": path.as_posix(),
             }
-            row.update(read_solve_status(result_dir, path.name, network_path.exists()))
             row.update(network_metadata)
             row.update(parse_benchmark_name(path.name, row.get("solver")))
             row.update(read_benchmark(path))
@@ -232,11 +164,6 @@ def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
         "planning_horizons",
         "benchmark_file",
         "network_file",
-        "solve_status",
-        "termination_condition",
-        "infeasible",
-        "time_limit_reached",
-        "solve_log_files",
         "objective",
         "objective_constant",
     ]
