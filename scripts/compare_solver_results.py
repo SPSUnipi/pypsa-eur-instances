@@ -196,12 +196,16 @@ if __name__ == "__main__":
 
     configured_solver_specs = list(snakemake.params.solver_specs)
     network_paths = {
-        Path(path).stem.rsplit("__", 1)[-1]: path
+        solver["label"]: path
         for path in snakemake.input.networks
+        for solver in configured_solver_specs
+        if Path(path).stem.endswith(f'_{solver["label"]}')
     }
     benchmark_paths = {
-        Path(path).name.rsplit("__", 1)[-1]: path
+        solver["label"]: path
         for path in snakemake.input.benchmarks
+        for solver in configured_solver_specs
+        if Path(path).stem.endswith(f'_{solver["label"]}')
     }
     solver_inputs = [
         (solver, network_paths[solver["label"]], benchmark_paths[solver["label"]])
@@ -209,7 +213,26 @@ if __name__ == "__main__":
         if solver["label"] in network_paths and solver["label"] in benchmark_paths
     ]
     if not solver_inputs:
-        raise ValueError("No successful solver results are available for comparison.")
+        logger.warning(
+            "No successful solver results are available for comparison; "
+            "writing empty comparison outputs."
+        )
+        reference_solver = (
+            configured_solver_specs[0]["label"]
+            if configured_solver_specs
+            else "reference"
+        )
+        empty_outputs = {
+            "optimal_capacity": ["item", reference_solver],
+            "energy_balance": ["item", reference_solver],
+            "benchmarks": ["metric", reference_solver],
+            "summary": ["solver", "solver_name", "solver_options"],
+        }
+        for name, columns in empty_outputs.items():
+            output = Path(getattr(snakemake.output, name))
+            output.parent.mkdir(parents=True, exist_ok=True)
+            pd.DataFrame(columns=columns).to_csv(output, index=False)
+        raise SystemExit(0)
 
     solver_specs = [solver for solver, _, _ in solver_inputs]
     reference_solver = configured_solver_specs[0]["label"]
