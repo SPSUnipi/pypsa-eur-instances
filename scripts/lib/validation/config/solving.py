@@ -469,11 +469,8 @@ class SolvingConfig(BaseModel):
             },
             "smspp-unitcommitment-pph": {
                 "capacity_expansion_ucblock": False,
-                "configfile": "config/smspp/TSSBlock/TSSBCfg_grb.txt",
-                "stochastic_parameters": {
-                    "stochastic_type": "tssb",
-                    "parameters": ["demand", "renewable_maxpower"],
-                },
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/PPH/PPHCfg.txt",
             }, 
         },
         description="Dictionaries with solver-specific parameter settings.",
