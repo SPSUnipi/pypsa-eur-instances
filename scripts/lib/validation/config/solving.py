@@ -467,7 +467,14 @@ class SolvingConfig(BaseModel):
                     "parameters": ["demand", "renewable_maxpower"],
                 },
             },
-            # Luca aggiungi
+            "smspp-unitcommitment-pph": {
+                "capacity_expansion_ucblock": False,
+                "configfile": "config/smspp/TSSBlock/TSSBCfg_grb.txt",
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            }, 
         },
         description="Dictionaries with solver-specific parameter settings.",
     )
