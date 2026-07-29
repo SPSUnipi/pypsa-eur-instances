@@ -1313,7 +1313,6 @@ solving:
       configfile: config/smspp/TSSBlock/TSSBCfg_grb.txt
       stochastic_parameters:
         stochastic_type: tssb
-        capacity_expansion_ucblock: true
         parameters:
         - demand
         - renewable_maxpower

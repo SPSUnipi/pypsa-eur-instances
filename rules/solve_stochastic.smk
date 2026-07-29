@@ -93,6 +93,8 @@ rule solve_sector_network:
             if config["solving"]["options"]["store_model"]
             else []
         ),
+    wildcard_constraints:
+        solver=r"(?!.*__(?:avg|sc-))[-+a-zA-Z0-9_\.]+",
     log:
         solver=RESULTS
         + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_solver.log",
