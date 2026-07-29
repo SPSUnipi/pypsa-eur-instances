@@ -1,11 +1,11 @@
-# yaml-language-server: $schema=schema.default.json
+# yaml-language-server: $schema=../../schema.default.json
 
 run:
-  prefix: "power-IT-TSSB"
+  prefix: "capacity-expansion-tssb-power-IT-noUC"
   name: all
   scenarios:
     enable: true
-    file: config/instances/scenarios/scenarios-TSSB-power.yaml
+    file: config/instances/scenarios/tssb/scenarios-power.yaml
   disable_progressbar: true
   shared_resources:
     policy: false
@@ -16,14 +16,25 @@ foresight: overnight
 
 scenario:
   clusters:
-  - 5
-  - 10
+  - 2
   - 20
   - 50
-  - 100
 
   opts:
   - ''
+
+countries:
+- IT
+
+stochastic_scenarios:
+  enable: true
+  file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  export:
+    average: true
+    scenarios: true
+  postprocess:
+    use_average: false
+    scenarios: false
 
 clustering:
   temporal:
@@ -40,13 +51,3 @@ solving:
   solver:
     name: [gurobi, smspp]
     options: [gurobi-default, smspp-tssb]
-  solver_options:
-    "smspp-tssb":
-      stochastic_parameters:
-        stochastic_type: tssb
-        capacity_expansion_ucblock: true
-        configfile: "TSSB/tssb_solverconfig_grb.txt"
-        parameters:
-        - demand
-  runtime: 12H
-  
