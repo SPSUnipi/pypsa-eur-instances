@@ -471,6 +471,9 @@ class SolvingConfig(BaseModel):
                 "capacity_expansion_ucblock": False,
                 "enable_thermal_units": True,
                 "configfile": "config/smspp/PPH/PPHCfg.txt",
+                "pysmspp_options": {
+                    "B": "config/smspp/PPH/InnerBCfg.txt",
+                },
             }, 
         },
         description="Dictionaries with solver-specific parameter settings.",

@@ -1,0 +1,33 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - HSUBSCfg.txt- - - - - - - - - - - - - - - - -
+#
+# A txt description of a BlockSolverConfig for the HydroSystemUnitBlock
+#
+# Note: this is allowed empty, i.e., to be a BlockSolverConfig with
+#       0 Solver, in which case HydroSystemUnitBlock will be treated as
+#       "easy components" (this is a problem if the HydroSystemUnitBlock is
+#       modified by adding rows, but not for "one-shot" solutions)
+#
+#   Antonio Frangioni
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BlockSolverConfig     # exact type of the Configuration object
+
+1  # the BlockSolverConfig is a "differential" one
+
+0 # number of (the names of) Solver in this BlockSolverConfig
+# now all the names of the Solver - - - - - - - - - - - - - - - - - - - - - -
+#CPXMILPSolver
+#SCIPMILPSolver
+#GRBMILPSolver
+
+0 # number of ComputeConfig in this BlockSolverConfig
+
+# now all the ComputeConfig
+#*LPCCfg.txt
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - END HSUBSCfg.txt- - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

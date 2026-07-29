@@ -49,6 +49,6 @@ solving:
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp]
-    options: [gurobi-default, smspp-unitcommitment-pph]
+    name: [smspp]
+    options: [smspp-unitcommitment-pph]
 

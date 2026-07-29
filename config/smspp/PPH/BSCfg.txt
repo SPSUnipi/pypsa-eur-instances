@@ -1,10 +1,10 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - - LPBSCfg.txt - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - BSCfg.txt - - - - - - - - - - - - - - - - -
 #
 # A txt description of a BlockSolverConfig for any Block that is a simple
-# LP / QP (continuous, convex, separable) and can be solved by a :MILPSolver
+# MILP / MIQP / MIQCQP and can be solved by a :MILPSolver
 #
-#   Enrico Gorgone, Antonio Frangioni
+#   Antonio Frangioni
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -13,14 +13,14 @@ BlockSolverConfig     # exact type of the Configuration object
 
 1  # the BlockSolverConfig is a "differential" one
 
-1 # number of (the names of) Solver in this BlockSolverConfig
+1  # number of (the names of) Solver in this BlockSolverConfig
 # now all the names of the Solver - - - - - - - - - - - - - - - - - - - - - -
 #CPXMILPSolver
 #HiGHSMILPSolver
 #SCIPMILPSolver
 GRBMILPSolver
 
-1 # number of ComputeConfig in this BlockSolverConfig
+1  # number of ComputeConfig in this BlockSolverConfig
 
 # now all the ComputeConfig
 
@@ -29,21 +29,24 @@ ComputeConfig # exact type of the ComputeConfig object
 1  # f_diff == 0 ==> all non-provided parameters are set to the default value
    # f_diff == 1 ==> all non-provided parameters are not changed
 
-2 # number of integer parameters
+2  # number of integer parameters
 
 # now all the integer parameters
-intLogVerb      0 # log verbosity of the MILPSolver
-intRelaxIntVars 1 # nonzero if the continuous relaxation is solved
+intLogVerb      0    # log verbosity of the MILPSolver
+intRelaxIntVars 1    # nonzero if the continuous relaxation is solved
 
-0 # number of double parameters
+3 # number of double parameters
 
 # now all the double parameters
-# [none]
+dblAAccSol 1e-04     # absolute accuracy of the solution    
+dblRAccSol 1e-04     # relative accuracy of the solution 
+dblMaxTime 3600      # max running time (seconds)
 
 0 # number of string parameters
 
 # now all the string parameters
-#strOutputFile  unit.lp
+#strOutputFile	 uc.lp                    # filename for .lp file 
+#strLogFileName  uc-milp.log              # filename for the Solver log
 
 0 # number of vector-of-int parameters
 
@@ -64,5 +67,5 @@ intRelaxIntVars 1 # nonzero if the continuous relaxation is solved
 * # [none]
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - - END LPBSCfg.txt - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - END BSCfg.txt - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
