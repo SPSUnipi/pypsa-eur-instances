@@ -98,7 +98,7 @@ str_LDSlv_ISName           BundleSolver # the inner Solver used by LagrangianDua
 # BlockSolverConfig (classname -> BlockSolverConfig) so each unit type gets its
 # own Solver, e.g. ThermalUnitBlock -> ThermalUnitExtDPSolver. Edit
 # InnerBSCfg.txt to change the Solver of every unit of a given type at once.
-str_LagBF_BSCfg  config/InnerBSCfg.txt
+str_LagBF_BSCfg  InnerBSCfg.txt
 
 0 # number of vector-of-int parameters
 
