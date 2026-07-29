@@ -10,8 +10,8 @@ localrules:
     prepare_sector_networks,
     solve_elec_networks,
     compare_solver_elec_outputs,
+    compare_solver_elec_tssb_outputs,
     compare_solver_sector_outputs,
-    compare_solver_tssb_outputs,
     solve_sector_networks,
 
 
@@ -111,14 +111,12 @@ def sector_solver_comparison_paths(w):
     )
 
 
-def tssb_solver_comparison_paths(w):
+def electricity_tssb_solver_comparison_paths(w):
     return expand(
         RESULTS
-        + "csvs/solver_comparison/summary_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_tssb.csv",
+        + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}_tssb.csv",
         clusters=config_provider("scenario", "clusters")(w),
         opts=config_provider("scenario", "opts")(w),
-        sector_opts=config_provider("scenario", "sector_opts")(w),
-        planning_horizons=config_provider("scenario", "planning_horizons")(w),
         run=config["run"]["name"],
     )
 
@@ -130,18 +128,19 @@ rule compare_solver_elec_outputs:
         "Collecting electricity solver comparison files"
 
 
+rule compare_solver_elec_tssb_outputs:
+    input:
+        electricity_tssb_solver_comparison_paths,
+    message:
+        "Collecting stochastic TSSB electricity solver comparison files"
+
+
 rule compare_solver_sector_outputs:
     input:
         sector_solver_comparison_paths,
     message:
         "Collecting sector-coupled solver comparison files"
 
-
-rule compare_solver_tssb_outputs:
-    input:
-        tssb_solver_comparison_paths,
-    message:
-        "Collecting stochastic TSSB solver comparison files"
 
 
 rule solve_sector_networks:

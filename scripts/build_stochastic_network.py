@@ -1612,7 +1612,7 @@ if __name__ == "__main__":
         from scripts._helpers import mock_snakemake
 
         snakemake = mock_snakemake(
-            "build_stochastic_network",
+            "build_stochastic_sector_network",
             opts="",
             clusters="adm",
             configfiles="config/test_stochastic_scenarios/config.yaml",

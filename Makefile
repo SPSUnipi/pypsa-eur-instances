@@ -10,7 +10,7 @@ help:
 	@printf "SMS++ workflow targets\n"
 	@printf "  run-instances-elec: Generate SMS++ instances for electricity\n"
 	@printf "  run-instances-sector: Generate SMS++ instances for sector-coupled\n"
-	@printf "  run-instances-tssb: Generate SMS++ TSSB instances for stochastic sector-coupled\n"
+	@printf "  run-instances-tssb: Generate SMS++ TSSB instances for electricity and sector-coupled\n"
 	@printf "  run-instances: Generate SMS++ instances for both electricity and sector-coupled\n"
 	@printf "\n"
 	@printf "Overrides: CORES=%s \n" "$(CORES)"
@@ -25,7 +25,7 @@ run-instances-sector:
 
 .PHONY: run-instances-tssb
 run-instances-tssb:
-	pixi run snakemake --cores $(CORES) compare_solver_tssb_outputs --configfile config/instances/instances-IT-TSSB.yaml
+	pixi run snakemake --cores $(CORES) compare_solver_elec_tssb_outputs compare_solver_sector_outputs --configfile config/instances/instances-IT-TSSB.yaml
 
 .PHONY: run-instances
 run-instances:

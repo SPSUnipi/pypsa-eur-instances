@@ -7,7 +7,39 @@ import re
 import yaml
 
 
-rule build_stochastic_network:
+rule build_stochastic_elec_network:
+    input:
+        network=resources("networks/base_s_{clusters}_elec_{opts}.nc"),
+    output:
+        network=resources("networks/base_s_stoch_{clusters}_elec_{opts}.nc"),
+        config=RESULTS
+        + "configs/config.base_s_stoch_{clusters}_elec_{opts}.yaml",
+    log:
+        python=RESULTS
+        + "logs/build_stochastic_network/base_s_stoch_{clusters}_elec_{opts}_python.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/build_stochastic_network/base_s_stoch_{clusters}_elec_{opts}"
+    shadow:
+        shadow_config
+    threads: 1
+    resources:
+        mem_mb=config_provider("solving", "mem_mb"),
+        runtime=config_provider("solving", "runtime", default="1h"),
+    params:
+        solving=config_provider("solving"),
+        foresight=config_provider("foresight"),
+        co2_sequestration_potential=config_provider(
+            "sector", "co2_sequestration_potential", default=200
+        ),
+        stochastic_scenarios=config_provider("stochastic_scenarios"),
+    message:
+        "Building stochastic electricity network"
+    script:
+        scripts("build_stochastic_network.py")
+
+
+rule build_stochastic_sector_network:
     input:
         network=resources(
             "networks/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}.nc"
