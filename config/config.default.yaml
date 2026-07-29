@@ -1313,7 +1313,7 @@ solving:
       enable_thermal_units: true
       configfile: "config/smspp/PPH/PPHCfg.txt"
       pysmspp_options:
-        B: "config/smspp/PPH/InnerBCfg.txt"
+        B: "InnerBCfg.txt"
     "smspp-tssb":
       capacity_expansion_ucblock: true
       configfile: config/smspp/TSSBlock/TSSBCfg_grb.txt
