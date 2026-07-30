@@ -1,8 +1,10 @@
 # SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
 #
 # SPDX-License-Identifier: MIT
-"""Collect solve benchmarks and objectives below one or more results prefixes.
-  python scripts/collect_solve_benchmarks.py \
+"""
+Collect solve benchmarks and objectives below one or more results prefixes.
+
+python scripts/collect_solve_benchmarks.py \
     --prefix dispatch-power-IT \
     --output results/solve_benchmarks.csv
 """
@@ -10,12 +12,26 @@
 import argparse
 import json
 import logging
+import re
 from pathlib import Path
 
 import pandas as pd
 import xarray as xr
 
 logger = logging.getLogger(__name__)
+
+STATUS_RE = re.compile(
+    r"Solving status ['\"](?P<status>[^'\"]+)['\"] "
+    r"with termination condition ['\"](?P<condition>[^'\"]+)['\"]",
+    re.IGNORECASE,
+)
+TERMINATION_RE = re.compile(
+    r"Termination condition:\s*(?P<condition>[^\r\n]+)", re.IGNORECASE
+)
+TIME_LIMIT_RE = re.compile(
+    r"(?:TimeLimit|time[_ ]limit)\s*[:=]\s*(?P<seconds>\d+(?:\.\d+)?)",
+    re.IGNORECASE,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -94,6 +110,35 @@ def read_benchmark(path: Path) -> dict:
     return {key: pd.NA if value == "NA" else value for key, value in benchmark.items()}
 
 
+def read_solve_outcome(path: Path, configured_time_limit: object = pd.NA) -> dict:
+    """Read the final solve outcome and configured time limit from its Python log."""
+    log_path = (
+        result_directory(path) / "logs" / path.parent.name / f"{path.name}_python.log"
+    )
+    metadata = {
+        "solve_status": pd.NA,
+        "termination_condition": pd.NA,
+        "time_limit_s": configured_time_limit,
+    }
+    if not log_path.exists():
+        logger.warning("No Python solve log found for %s", path)
+        return metadata
+
+    text = log_path.read_text(errors="replace")
+    status_matches = list(STATUS_RE.finditer(text))
+    termination_matches = list(TERMINATION_RE.finditer(text))
+    limit_matches = list(TIME_LIMIT_RE.finditer(text))
+    if status_matches:
+        match = status_matches[-1]
+        metadata["solve_status"] = match["status"].strip()
+        metadata["termination_condition"] = match["condition"].strip()
+    elif termination_matches:
+        metadata["termination_condition"] = termination_matches[-1]["condition"].strip()
+    if limit_matches:
+        metadata["time_limit_s"] = float(limit_matches[-1]["seconds"])
+    return metadata
+
+
 def result_directory(path: Path) -> Path:
     """Return the directory containing the benchmarks and networks folders."""
     benchmark_index = path.parts.index("benchmarks")
@@ -118,12 +163,23 @@ def read_network_metadata(path: Path) -> dict:
         return metadata
     try:
         config = json.loads(meta)
-        solver = config.get("solving", {}).get("solver", {})
+        solving = config.get("solving", {})
+        solver = solving.get("solver", {})
+        option_name = solver.get("options")
+        option_values = solving.get("solver_options", {}).get(option_name, {})
+        time_limit = option_values.get("TimeLimit", pd.NA)
+        configfile = option_values.get("configfile")
+        if pd.isna(time_limit) and configfile and Path(configfile).exists():
+            config_text = Path(configfile).read_text(errors="replace")
+            match = re.search(r"\bdblMaxTime\s+(\d+(?:\.\d+)?)", config_text)
+            if match:
+                time_limit = float(match[1])
         metadata.update(
             {
                 "solver": config.get("wildcards", {}).get("solver"),
                 "solver_name": solver.get("name", pd.NA),
-                "solver_options": solver.get("options", pd.NA),
+                "solver_options": option_name,
+                "time_limit_s": time_limit,
             }
         )
     except (TypeError, json.JSONDecodeError):
@@ -147,6 +203,7 @@ def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
             row.update(network_metadata)
             row.update(parse_benchmark_name(path.name, row.get("solver")))
             row.update(read_benchmark(path))
+            row.update(read_solve_outcome(path, row.get("time_limit_s", pd.NA)))
             rows.append(row)
 
     leading_columns = [
@@ -166,12 +223,17 @@ def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
         "network_file",
         "objective",
         "objective_constant",
+        "solve_status",
+        "termination_condition",
+        "time_limit_s",
     ]
     if not rows:
         return pd.DataFrame(columns=leading_columns)
 
     df = pd.DataFrame(rows)
-    remaining_columns = [column for column in df.columns if column not in leading_columns]
+    remaining_columns = [
+        column for column in df.columns if column not in leading_columns
+    ]
     return df[leading_columns + remaining_columns].sort_values(
         ["prefix", "case", "benchmark_rule", "case_result", "solver"],
         na_position="last",
