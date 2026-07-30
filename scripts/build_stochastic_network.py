@@ -12,6 +12,7 @@ This script is intended to run before solve_network.py:
 - export the stochastic pre-solve network.
 """
 
+import hashlib
 import logging
 import re
 import sys
@@ -1322,6 +1323,47 @@ def _validate_modify_rule(rule: Mapping[str, Any]) -> None:
         )
 
 
+def _resolve_random_value(value: Any, scenario: str | None) -> Any:
+    """Resolve a reproducible scalar random distribution specification."""
+    if not isinstance(value, Mapping) or "distribution" not in value:
+        return value
+
+    distribution = str(value["distribution"]).strip().lower()
+    seed = int(value.get("seed", 123))
+    scenario_key = "" if scenario is None else str(scenario)
+    digest = hashlib.sha256(f"{seed}:{scenario_key}".encode()).digest()
+    rng = np.random.default_rng(int.from_bytes(digest[:8], "little"))
+
+    if distribution == "normal":
+        sampled = rng.normal(
+            loc=float(value.get("mean", 1.0)),
+            scale=float(value["std"]),
+        )
+    elif distribution == "uniform":
+        sampled = rng.uniform(
+            low=float(value["low"]),
+            high=float(value["high"]),
+        )
+    else:
+        raise ValueError(
+            f"Unsupported random distribution '{distribution}'. "
+            "Allowed: normal, uniform"
+        )
+
+    if "min" in value:
+        sampled = max(sampled, float(value["min"]))
+    if "max" in value:
+        sampled = min(sampled, float(value["max"]))
+
+    logger.info(
+        "Sampled random value %.6g from %s distribution for scenario '%s'.",
+        sampled,
+        distribution,
+        scenario_key or "deterministic",
+    )
+    return float(sampled)
+
+
 def _apply_modify_components_rule(
     n: pypsa.Network,
     rule: Mapping[str, Any],
@@ -1348,7 +1390,7 @@ def _apply_modify_components_rule(
     attribute = str(rule["attribute"])
     operation = str(rule["operation"]).strip().lower()
     target = str(rule.get("target", "auto")).strip().lower()
-    value = rule["value"]
+    value = _resolve_random_value(rule["value"], scenario=scenario)
 
     table_name, static_df, ts_df = _get_component_attr_tables(
         n=n,
@@ -1612,7 +1654,7 @@ if __name__ == "__main__":
         from scripts._helpers import mock_snakemake
 
         snakemake = mock_snakemake(
-            "build_stochastic_network",
+            "build_stochastic_sector_network",
             opts="",
             clusters="adm",
             configfiles="config/test_stochastic_scenarios/config.yaml",

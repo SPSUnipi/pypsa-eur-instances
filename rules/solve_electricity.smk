@@ -5,7 +5,11 @@
 
 rule solve_network:
     input:
-        network=resources("networks/base_s_{clusters}_elec_{opts}.nc"),
+        network=lambda w: (
+            resources("networks/base_s_stoch_{clusters}_elec_{opts}.nc").format(**w)
+            if config["stochastic_scenarios"]["enable"]
+            else resources("networks/base_s_{clusters}_elec_{opts}.nc").format(**w)
+        ),
     output:
         network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
         config=RESULTS + "configs/config.base_s_{clusters}_elec_{opts}_{solver}.yaml",

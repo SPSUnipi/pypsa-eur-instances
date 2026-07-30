@@ -1,0 +1,20 @@
+demand_scenario: &demand_scenario
+  name: modify_components
+  params:
+    rules:
+    - component: Load
+      attribute: p_set
+      target: timeseries
+      operation: scale
+      value:
+        distribution: normal
+        mean: 1.0
+        std: 0.1
+        min: 0.8
+        max: 1.2
+        seed: 123
+
+scenarios:
+  demand_01: {prob: 0.3333333333, structured_scenario: *demand_scenario}
+  demand_02: {prob: 0.3333333334, structured_scenario: *demand_scenario}
+  demand_03: {prob: 0.3333333333, structured_scenario: *demand_scenario}

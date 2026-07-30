@@ -1,0 +1,103 @@
+th_24c24_demand:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_48c24_demand:
+  clustering:
+    temporal:
+      resolution_elec: 48c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_168c24_demand:
+  clustering:
+    temporal:
+      resolution_elec: 168c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_365c24_demand:
+  clustering:
+    temporal:
+      resolution_elec: 1H
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_24c24_renewable:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-renewable-maxpower_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - renewable_maxpower
+
+th_48c24_renewable:
+  clustering:
+    temporal:
+      resolution_elec: 48c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-renewable-maxpower_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - renewable_maxpower
+
+th_168c24_renewable:
+  clustering:
+    temporal:
+      resolution_elec: 168c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-renewable-maxpower_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - renewable_maxpower
+
+th_365c24_renewable:
+  clustering:
+    temporal:
+      resolution_elec: 1H
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-renewable-maxpower_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - renewable_maxpower
