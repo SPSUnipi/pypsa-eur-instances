@@ -26,7 +26,9 @@ from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter
 
 logger = logging.getLogger(__name__)
 
-TIME_RESOLUTION_RE = re.compile(r"(?:^|/)th_(?P<periods>\d+)c(?P<hours>\d+)(?:$|/)")
+TIME_RESOLUTION_RE = re.compile(
+    r"(?:^|/)th_(?P<periods>\d+)c(?P<hours>\d+)(?P<variant>__[^/]+)?(?:$|/)"
+)
 REQUIRED_COLUMNS = {"case", "clusters", "solver_options", "s"}
 OUTCOME_STYLES = {
     "infeasible": {"marker": "P", "label": "Infeasible", "size": 100},
@@ -75,6 +77,14 @@ def parse_time_resolution(case: object) -> tuple[int, int] | None:
     return int(match["periods"]), int(match["hours"])
 
 
+def parse_case_variant(case: object) -> str:
+    """Extract the discriminator after ``__`` in a time-resolution component."""
+    match = TIME_RESOLUTION_RE.search(str(case))
+    if match is None or match["variant"] is None:
+        return ""
+    return match["variant"][2:]
+
+
 def prepare_data(path: Path) -> pd.DataFrame:
     data = pd.read_csv(path)
     missing = REQUIRED_COLUMNS.difference(data.columns)
@@ -98,6 +108,7 @@ def prepare_data(path: Path) -> pd.DataFrame:
     data[["periods", "hours_per_period"]] = pd.DataFrame(
         parsed.dropna().tolist(), index=data.index
     )
+    data["case_variant"] = data["case"].map(parse_case_variant)
     data["modeled_hours"] = data["periods"] * data["hours_per_period"]
     data["clusters"] = pd.to_numeric(data["clusters"], errors="coerce")
     data["runtime_s"] = pd.to_numeric(data["s"], errors="coerce")
@@ -151,6 +162,7 @@ def prepare_data(path: Path) -> pd.DataFrame:
 
     # Repeated runs of the same configuration are summarized robustly.
     group_columns = [
+        "case_variant",
         "solver_options",
         "clusters",
         "periods",
@@ -165,6 +177,11 @@ def prepare_data(path: Path) -> pd.DataFrame:
         .median()
         .sort_values(["periods", "hours_per_period", "clusters", "solver_options"])
     )
+
+
+def variant_slug(variant: str) -> str:
+    """Return a filesystem-safe suffix for a case variant."""
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", variant).strip("_.-") or "unlabelled"
 
 
 def resolution_label(periods: int, hours: int) -> str:
@@ -379,6 +396,64 @@ def save_figure(
     plt.close(figure)
 
 
+def plot_case(
+    data: pd.DataFrame,
+    args: argparse.Namespace,
+    output_dir: Path,
+    colors: dict[str, object],
+    stem_suffix: str,
+    title_suffix: str,
+) -> None:
+    """Create all benchmark figures for one case variant."""
+    solvers = sorted(data["solver_options"].unique())
+    title = f"{args.title} — {title_suffix}" if title_suffix else args.title
+    figures = (
+        ("node_scaling", make_node_scaling_figure),
+        ("time_scaling", make_time_scaling_figure),
+    )
+    for dimension, make_figure in figures:
+        figure = make_figure(data, solvers, colors, title, args.log_scale)
+        save_figure(
+            figure,
+            output_dir / f"benchmark_{dimension}{stem_suffix}",
+            args.formats,
+            args.dpi,
+        )
+
+    valid_objective = data["objective"].notna() & (data["objective"] > 0)
+    if not valid_objective.all():
+        logger.warning(
+            "Ignoring %d row(s) without a positive objective value%s.",
+            int((~valid_objective).sum()),
+            f" for case variant {title_suffix}" if title_suffix else "",
+        )
+    objective_data = data.loc[valid_objective].copy()
+    if objective_data.empty:
+        logger.warning("No numeric objective values found; skipping objective plots.")
+        return
+    objective_solvers = sorted(objective_data["solver_options"].unique())
+    heading = (
+        f"Objective function — {title_suffix}" if title_suffix else "Objective function"
+    )
+    for dimension, make_figure in figures:
+        figure = make_figure(
+            objective_data,
+            objective_solvers,
+            colors,
+            title,
+            False,
+            y="objective",
+            y_label="Objective value",
+            heading=heading,
+        )
+        save_figure(
+            figure,
+            output_dir / f"benchmark_objective_{dimension}{stem_suffix}",
+            args.formats,
+            args.dpi,
+        )
+
+
 def main() -> None:
     args = parse_args()
     output_dir = args.output_dir or args.input.parent / "plots"
@@ -397,65 +472,14 @@ def main() -> None:
         }
     )
     data = prepare_data(args.input)
-    solvers = sorted(data["solver_options"].unique())
-    colors = solver_colors(solvers)
-
-    node_figure = make_node_scaling_figure(
-        data, solvers, colors, args.title, args.log_scale
-    )
-    save_figure(
-        node_figure, output_dir / "benchmark_node_scaling", args.formats, args.dpi
-    )
-    time_figure = make_time_scaling_figure(
-        data, solvers, colors, args.title, args.log_scale
-    )
-    save_figure(
-        time_figure, output_dir / "benchmark_time_scaling", args.formats, args.dpi
-    )
-
-    invalid_objectives = data["objective"].isna() | (data["objective"] <= 0)
-    if invalid_objectives.any():
-        logger.warning(
-            "Ignoring %d row(s) without a positive objective value.",
-            int(invalid_objectives.sum()),
-        )
-    objective_data = data.loc[~invalid_objectives].copy()
-    if objective_data.empty:
-        logger.warning("No numeric objective values found; skipping objective plots.")
-        return
-    objective_solvers = sorted(objective_data["solver_options"].unique())
-    objective_node_figure = make_node_scaling_figure(
-        objective_data,
-        objective_solvers,
-        colors,
-        args.title,
-        False,
-        y="objective",
-        y_label="Objective value",
-        heading="Objective function",
-    )
-    save_figure(
-        objective_node_figure,
-        output_dir / "benchmark_objective_node_scaling",
-        args.formats,
-        args.dpi,
-    )
-    objective_time_figure = make_time_scaling_figure(
-        objective_data,
-        objective_solvers,
-        colors,
-        args.title,
-        False,
-        y="objective",
-        y_label="Objective value",
-        heading="Objective function",
-    )
-    save_figure(
-        objective_time_figure,
-        output_dir / "benchmark_objective_time_scaling",
-        args.formats,
-        args.dpi,
-    )
+    all_solvers = sorted(data["solver_options"].unique())
+    colors = solver_colors(all_solvers)
+    variants = list(data["case_variant"].drop_duplicates())
+    qualify_stems = len(variants) > 1 or any(variants)
+    for variant in variants:
+        variant_data = data.loc[data["case_variant"] == variant].copy()
+        stem_suffix = f"_{variant_slug(variant)}" if qualify_stems else ""
+        plot_case(variant_data, args, output_dir, colors, stem_suffix, variant)
 
 
 if __name__ == "__main__":
