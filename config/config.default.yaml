@@ -1309,7 +1309,7 @@ solving:
       pysmspp_options:
         B: "config/smspp/Thermal_DynamicProgramming/TUBCfg-DP.txt"
     "smspp-unitcommitment-pph":
-      capacity_expansion_ucblock: false
+      capacity_expansion_ucblock: true
       enable_thermal_units: true
       configfile: "config/smspp/PPH/PPHCfg.txt"
       pysmspp_options:

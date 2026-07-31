@@ -468,7 +468,7 @@ class SolvingConfig(BaseModel):
                 },
             },
             "smspp-unitcommitment-pph": {
-                "capacity_expansion_ucblock": False,
+                "capacity_expansion_ucblock": True,
                 "enable_thermal_units": True,
                 "configfile": "config/smspp/PPH/PPHCfg.txt",
                 "pysmspp_options": {
