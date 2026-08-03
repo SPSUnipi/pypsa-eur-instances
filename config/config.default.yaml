@@ -1308,12 +1308,6 @@ solving:
       configfile: "config/smspp/Thermal_DynamicProgramming/TUBSCfg-DP.txt"
       pysmspp_options:
         B: "config/smspp/Thermal_DynamicProgramming/TUBCfg-DP.txt"
-    "smspp-unitcommitment-pph":
-      capacity_expansion_ucblock: true
-      enable_thermal_units: true
-      configfile: "config/smspp/PPH/PPHCfg.txt"
-      pysmspp_options:
-        B: "InnerBCfg.txt"
     "smspp-tssb":
       capacity_expansion_ucblock: true
       configfile: config/smspp/TSSBlock/TSSBCfg_grb.txt
@@ -1322,6 +1316,12 @@ solving:
         parameters:
         - demand
         - renewable_maxpower
+    "smspp-unitcommitment-pph":
+      capacity_expansion_ucblock: true
+      enable_thermal_units: true
+      configfile: config/smspp/PPH/PPHCfg.txt
+      pysmspp_options:
+        B: config/smspp/PPH/InnerBCfg.txt
   check_objective:
     enable: false
     expected_value:
