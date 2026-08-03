@@ -1,5 +1,5 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - - LDCfg.txt - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - PPHCfg.txt- - - - - - - - - - - - - - - - -
 #
 # A txt description of a ComputeConfig for the LagrangianDualSolver wrapping
 # a BundleSolver as the inner Solver, applied to a UCBlock
@@ -120,5 +120,5 @@ str_LagBF_BSCfg  InnerBSCfg.txt
 # end of ComputeConfig- - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - END LDCfg.txt - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - END PPHCfg.txt- - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
