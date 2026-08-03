@@ -459,14 +459,6 @@ class SolvingConfig(BaseModel):
                     "B": "config/smspp/Thermal_DynamicProgramming/TUBCfg-DP.txt",
                 },
             },
-            "smspp-unitcommitment-pph": {
-                "capacity_expansion_ucblock": True,
-                "enable_thermal_units": True,
-                "configfile": "config/smspp/PPH/PPHCfg.txt",
-                "pysmspp_options": {
-                    "B": "config/smspp/PPH/InnerBCfg.txt",
-                },
-            }, 
             "smspp-tssb": {
                 "capacity_expansion_ucblock": True,
                 "configfile": "config/smspp/TSSBlock/TSSBCfg_grb.txt",
@@ -475,6 +467,14 @@ class SolvingConfig(BaseModel):
                     "parameters": ["demand", "renewable_maxpower"],
                 },
             },
+            "smspp-unitcommitment-pph": {
+                "capacity_expansion_ucblock": True,
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/PPH/PPHCfg.txt",
+                "pysmspp_options": {
+                    "B": "config/smspp/PPH/InnerBCfg.txt",
+                },
+            }, 
         },
         description="Dictionaries with solver-specific parameter settings.",
     )
