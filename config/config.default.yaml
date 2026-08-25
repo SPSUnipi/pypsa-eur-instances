@@ -1321,7 +1321,7 @@ solving:
       enable_thermal_units: true
       configfile: config/smspp/PPH/PPHCfg.txt
       pysmspp_options:
-        B: config/smspp/PPH/InnerBCfg.txt
+        B: InnerBCfg.txt
   check_objective:
     enable: false
     expected_value:

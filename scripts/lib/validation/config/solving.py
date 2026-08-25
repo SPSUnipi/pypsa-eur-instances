@@ -472,7 +472,7 @@ class SolvingConfig(BaseModel):
                 "enable_thermal_units": True,
                 "configfile": "config/smspp/PPH/PPHCfg.txt",
                 "pysmspp_options": {
-                    "B": "config/smspp/PPH/InnerBCfg.txt",
+                    "B": "InnerBCfg.txt",
                 },
             }, 
         },
