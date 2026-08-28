@@ -29,7 +29,14 @@ logger = logging.getLogger(__name__)
 TIME_RESOLUTION_RE = re.compile(
     r"(?:^|/)th_(?P<periods>\d+)c(?P<hours>\d+)(?P<variant>__[^/]+)?(?:$|/)"
 )
-REQUIRED_COLUMNS = {"case", "clusters", "solver_options", "s"}
+REQUIRED_COLUMNS = {
+    "case",
+    "clusters",
+    "solver_options",
+    "s",
+    "objective",
+    "objective_constant",
+}
 OUTCOME_STYLES = {
     "infeasible": {"marker": "P", "label": "Infeasible", "size": 100},
     "time_limit": {"marker": "X", "label": "Time limit", "size": 130},
@@ -112,10 +119,11 @@ def prepare_data(path: Path) -> pd.DataFrame:
     data["modeled_hours"] = data["periods"] * data["hours_per_period"]
     data["clusters"] = pd.to_numeric(data["clusters"], errors="coerce")
     data["runtime_s"] = pd.to_numeric(data["s"], errors="coerce")
-    data["objective"] = pd.to_numeric(
-        data.get("objective", pd.Series(index=data.index, dtype=float)),
-        errors="coerce",
+    data["objective"] = pd.to_numeric(data["objective"], errors="coerce")
+    data["objective_constant"] = pd.to_numeric(
+        data["objective_constant"], errors="coerce"
     )
+    data["objective"] += data["objective_constant"]
     data["time_limit_s"] = pd.to_numeric(
         data.get("time_limit_s", pd.Series(index=data.index, dtype=float)),
         errors="coerce",

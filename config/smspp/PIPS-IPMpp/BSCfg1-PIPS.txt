@@ -1,0 +1,73 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - BSCfg1-PIPS.txt - - - - - - - - - - - - - - -
+#
+# A txt description of a BlockSolverConfig for a TwoStageStochasticBlock
+# solved by one PIPSMILPSolver.
+#
+#   Antonio Frangioni
+#   Enrico Calandrini
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BlockSolverConfig     # exact type of the Configuration object
+
+1  # the BlockSolverConfig is a "differential" one
+
+1 # number of (the names of) Solver in this BlockSolverConfig
+# now all the names of the Solver - - - - - - - - - - - - - - - - - - - - - -
+PIPSMILPSolver        # name of Solver
+
+1 # number of ComputeConfig in this BlockSolverConfig
+
+# now all the ComputeConfig
+
+ComputeConfig # exact type of the ComputeConfig object
+
+1  # f_diff == 0 ==> all non-provided parameters are set to the default value
+   # f_diff == 1 ==> all non-provided parameters are not changed
+
+4 # number of integer parameters
+
+# now all the integer parameters
+intLogVerb             0  # log verbosity of the MILPSolver
+intRelaxIntVars        1  # nonzero if the continuous relaxation is solved (needed by PIPSMILPSolver)
+IPM_MAX_ITER        4000  # iteration limit for interior point method
+IP_ACCURACY_REDUCED    1  # whether to use reduced termination tolerance (mu and residual) for interior point method
+
+3 # number of double parameters
+
+# now all the double parameters
+dblRelAcc  1e-8      # relative accuracy required to solution
+IPM_TIMELIMIT 28800.0 # time limit in seconds for interior point method
+dblMaxTime 86400.0
+
+5 # number of string parameters
+
+# now all the string parameters
+SCALER geometricmean          # type of scaler to use
+IP_METHOD primal-dual         # interior point method to use
+LINEAR_ROOT_SOLVER mumps      # solver for linear system in root
+LINEAR_SUB_ROOT_SOLVER mumps  # solver for linear system in sub-root
+LINEAR_LEAF_SOLVER mumps      # solver for linear systems in leafs
+
+0 # number of vector-of-int parameters
+
+# now all the vector-of-int parameters
+# [none]
+
+0 # number of vector-of-double parameters
+
+# now all the vector-of-double parameters
+# [none]
+
+0 # number of vector-of-string parameters
+
+# now all the vector-of-string parameters
+# [none]
+
+# pointer to the "extra" Configuration
+* # [none]
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - END BSCfg1-PIPS.txt - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
