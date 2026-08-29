@@ -1,40 +1,38 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - - PPHCfg.txt- - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - PPHCfg.txt  - - - - - - - - - - - - - - - -
 #
-# A txt description of a ComputeConfig for the LagrangianDualSolver wrapping
-# a BundleSolver as the inner Solver, applied to a UCBlock
+# A txt description of the ComputeConfig of a PrimalProximalHeur, which
+# basically is that of LagrangianDualSolver, which in turn basically is that
+# of the inner Solver, which is a BundleSolver
 #
-#   Donato Meoli
+#   Enrico Gorgone, Antonio Frangioni, Donato Meoli
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-BlockSolverConfig # The name of the configuration
-
-1  # The BlockSolverConfig is "differential"
-1  # The number of Solvers
-
-# now all the names of the Solver - - - - - - - - - - - - - - - - - - - - - -
-PrimalProximalHeur
-
-1  # The number of ComputeConfigs
-
-ComputeConfig         # exact type of the ComputeConfig object
+ComputeConfig # exact type of the ComputeConfig object
 
 1  # f_diff == 0 ==> all non-provided parameters are set to the default value
    # f_diff == 1 ==> all non-provided parameters are not changed
 
-24 # number of integer parameters
+25 # number of integer parameters
 
 # now all the integer parameters
-intMaxIterPPH      10 # max number of outer PPH iterations (default = Inf<int>())
-                      # set explicitly for the test battery so the heuristic
-                      # terminates even when penalty < 1e-3 is unreachable on
-                      # large instances (NumStatVar * R >> 1e-3)
+intMaxIter         10 # max number of iterations of the heuristic itself
+                      # (default = Inf<int>()); set explicitly for the test
+                      # battery so it terminates even when penalty < 1e-3 is
+                      # unreachable on large instances (NumStatVar * R >> 1e-3)
+intInnerMaxIter   500 # max number of iterations of each call to the inner
+                      # Solver, which has to converge for the fractional
+                      # solution the penalty is built on to mean anything;
+                      # the cap is what the first penalized call, the only
+                      # one that does not converge, is stopped by
+intUseWarmStartPSol 0 # 0 = the first iteration is not penalized and its
+                      # bound is the valid one, 1 = the primal solution of
+                      # the warm start is the first proximal center
 intDoEasy           1 # do easy components for (some) LagBFunction
-intMaxIter          1 # max number of iterations for each call
 intMaxThread        1 # MaxThread, max number of new tasks to spawn
-intLogVerb         10 # log verbosity of main Bundle algorithm
+intLogVerb          0 # log verbosity of main Bundle algorithm
 intWZNorm           2 # which norm to use in the norm-based stopping condition
 intBPar1           20 # discard items when they have been useless for <this> iterations
 intBPar2          100 # max bundle size per component
@@ -66,12 +64,17 @@ intOSImp2           0 # pre-processing (reduction)
 intOSImp3           1 # threads
 intRstAlg           2 # parameter to handle the reset of the algorithm
 
-4 # number of double parameters
+7 # number of double parameters
 
 # now all the double parameters
-dblRelAcc          1e-4 # relative accuracy required to solution
-dblNZEps           1e+2 # (1e-6) stopping parameter: threshold to declare 0 the || residual ||
-dbltStar             -1 # (-1) stopping parameter: multiplied to || residual || to estimate gap
+dblMaxTime      43200.0 # max CPU time for the whole heuristic
+dblRelAcc          1e-4 # relative accuracy required of the solution the
+                        # heuristic produces: it stops as soon as its
+                        # gap is this small, and returns kOK
+dblInnerRelAcc     1e-4 # relative accuracy the inner Solver solves the
+                        # Lagrangian Dual with
+dblNZEps           1e-4 # stopping parameter: threshold to declare 0 the || residual ||
+dbltStar           1e+4 # stopping parameter: multiplied to || residual || to estimate gap
 #dblBPar5             4 # first parameter for dynamic max n. of items per iteration
 #dblm1            -0.30 # a NS is possible if (~) Fi( Lambda1 ) >= Fi( Lambda ) + | m1 | v*
 #dblm2             0.90 # a SS is possible if Fi( Lambda1 ) <= Fi( Lambda ) + ( 1 - m2 ) v*
@@ -82,22 +85,21 @@ dbltStar             -1 # (-1) stopping parameter: multiplied to || residual || 
 #dblmnDecr         0.66 # min decrease of t (each time it is decreased)
 #dbltMaior         1e+6 # maximum value for t
 #dbltMinor        1e-10 # minimum value for t
-#dbltInit          1e-3 # initial value for t
+dbltInit           1e-3 # initial value for t
 #dbltSPar2         1e-2 # parameter for the long-term t-strategy
 #dblCtOff          0.01 # cut-off factor for pricing in MinQuad
 
 dbl_penaltyFactor  1e+3
 
-2 # number of string parameters
+3 # number of string parameters
 
 # now all the string parameters
-#str_LDSlv_ISName  ParallelBundleSolver # the inner Solver used by LagrangianDualSolver
-str_LDSlv_ISName           BundleSolver # the inner Solver used by LagrangianDualSolver
-# the BlockSolverConfig for the inner Blocks of the LagBFunction(s): a "meta"
-# BlockSolverConfig (classname -> BlockSolverConfig) so each unit type gets its
-# own Solver, e.g. ThermalUnitBlock -> ThermalUnitExtDPSolver. Edit
-# InnerBSCfg.txt to change the Solver of every unit of a given type at once.
-str_LagBF_BSCfg  InnerBSCfg.txt
+#str_LDSlv_ISName ParallelBundleSolver # the inner Solver used by LagrangianDualSolver
+strWarmStartBSC     WarmStartCfg.txt # BlockSolverConfig of the warm start,
+                                     # empty = no warm start
+str_LDSlv_ISName          BundleSolver # the inner Solver used by LagrangianDualSolver
+str_LagBF_BSCfg         InnerBSCfg.txt # BlockSolverConfig for the LagBFunctions,
+                                       # the same the LagrangianDualSolver uses
 
 0 # number of vector-of-int parameters
 
@@ -120,5 +122,5 @@ str_LagBF_BSCfg  InnerBSCfg.txt
 # end of ComputeConfig- - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - END PPHCfg.txt- - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - END PPHCfg.txt  - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
