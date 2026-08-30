@@ -13,6 +13,11 @@ BlockConfig
 
 1   # the BlockConfig is differential
 
+2  # version of the BlockConfig format
+
+# the Configuration for the structure, i.e., the tree of sub-Block - -
+*  # [none]
+
 # static constraints Configuration
 # a SimpleConfiguration< std::vector< double > > to set
 # the scaling constants in ACNetworkBlock

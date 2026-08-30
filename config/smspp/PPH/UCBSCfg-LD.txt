@@ -23,7 +23,7 @@ LagrangianDualSolver
 # now all the ComputeConfig
 # the ComputeConfig of the LagrangianDualSolver (mostly the ComputeConfig of
 # its inner [Parallel]BundleSolver)
-*config/LDCfg.txt
+*LDCfg.txt
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - END UCBSCfg-LD.txt- - - - - - - - - - - - - - -

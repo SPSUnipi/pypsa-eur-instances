@@ -25,7 +25,7 @@ LagrangianDualSolver
 # now all the ComputeConfig
 # the ComputeConfig of the LagrangianDualSolver (mostly the ComputeConfig of
 # its inner [Parallel]BundleSolver), with intDoEasy overridden to 0
-*config/LDCfg.txt +
+*LDCfg.txt +
 
 1  # f_diff == 1 ==> only the entries listed below are changed
 
