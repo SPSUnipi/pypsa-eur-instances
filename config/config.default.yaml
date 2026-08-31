@@ -1316,6 +1316,12 @@ solving:
         parameters:
         - demand
         - renewable_maxpower
+    "smspp-unitcommitment-pph":
+      capacity_expansion_ucblock: true
+      enable_thermal_units: true
+      configfile: config/smspp/PPH/PPHCfg.txt
+      pysmspp_options:
+        B: InnerBCfg.txt
   check_objective:
     enable: false
     expected_value:

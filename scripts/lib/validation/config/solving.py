@@ -467,6 +467,14 @@ class SolvingConfig(BaseModel):
                     "parameters": ["demand", "renewable_maxpower"],
                 },
             },
+            "smspp-unitcommitment-pph": {
+                "capacity_expansion_ucblock": True,
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/PPH/PPHCfg.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg.txt",
+                },
+            }, 
         },
         description="Dictionaries with solver-specific parameter settings.",
     )
