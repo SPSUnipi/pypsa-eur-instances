@@ -181,3 +181,5 @@ test = ["test"]
 
 [pypi-dependencies]
 pypsa = { git = "https://github.com/AlessandroPampado99/PyPSA.git", branch = "smspp_optimize", extras = ["smspp"] }
+pypsa2smspp = ">=0.0.5"
+pysmspp = ">=0.0.11"
