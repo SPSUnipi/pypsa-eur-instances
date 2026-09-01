@@ -1,0 +1,77 @@
+th_24c24_demand_3:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_48c24_demand_3:
+  clustering:
+    temporal:
+      resolution_elec: 48c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_168c24_demand_3:
+  clustering:
+    temporal:
+      resolution_elec: 168c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_24c24_demand_5:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_5.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_24c24_demand_10:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_10.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand
+
+th_24c24_demand_20:
+  clustering:
+    temporal:
+      resolution_elec: 24c24
+  stochastic_scenarios:
+    file: config/instances/scenarios/tssb/stochastic-demand_20.yaml
+  solving:
+    solver_options:
+      smspp-tssb:
+        stochastic_parameters:
+          parameters:
+          - demand

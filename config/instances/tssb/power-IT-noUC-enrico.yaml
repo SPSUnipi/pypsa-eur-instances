@@ -1,11 +1,11 @@
 # yaml-language-server: $schema=../../schema.default.json
 
 run:
-  prefix: "capacity-expansion-tssb-power-IT-UC"
+  prefix: "capacity-expansion-tssb-power-IT-noUC"
   name: all
   scenarios:
     enable: true
-    file: config/instances/scenarios/tssb/scenarios-power.yaml
+    file: config/instances/scenarios/tssb/scenarios-power-enrico.yaml
   disable_progressbar: true
   shared_resources:
     policy: false
@@ -17,6 +17,7 @@ foresight: overnight
 scenario:
   clusters:
   - 2
+  - 10
   - 20
   - 50
 
@@ -40,9 +41,6 @@ clustering:
   temporal:
     resolution_elec: 48c24
 
-conventional:
-  unit_commitment: true
-
 solving:
   options:
     load_shedding: 
@@ -52,5 +50,6 @@ solving:
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-tssb, smspp-tssb-pips-ipmpp]
+    name: [gurobi, smspp]
+    options: [gurobi-default, smspp-tssb-pips-ipmpp]
+  runtime: 4h

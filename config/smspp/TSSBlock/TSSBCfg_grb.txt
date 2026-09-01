@@ -32,9 +32,10 @@ ComputeConfig # exact type of the ComputeConfig object
 # now all the integer parameters
 intLogVerb               1 # log verbosity
 
-0 # number of double parameters
+1 # number of double parameters
 
 # now all the double parameters
+dblMaxTime 86400.0
 # [none]
 
 0 # number of string parameters
