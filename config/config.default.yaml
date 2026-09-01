@@ -1318,7 +1318,7 @@ solving:
         - renewable_maxpower
     "smspp-tssb-pips-ipmpp":
       capacity_expansion_ucblock: true
-      configfile: config/smspp/PIPS-IPMpp/BSCfg1-PIPS.txt
+      configfile: "config/smspp/PIPS-IPMpp/BSCfg1-PIPS.txt"
       stochastic_parameters:
         stochastic_type: tssb
         parameters:

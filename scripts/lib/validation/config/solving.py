@@ -368,7 +368,7 @@ class SolvingConfig(BaseModel):
                 "PreDual": 0,
                 "GURO_PAR_BARDENSETHRESH": 200,
                 "IISMethod": 1,
-                "TimeLimit": 43200,
+                "TimeLimit": 86400,
             },
             "gurobi-numeric-focus": {
                 "NumericFocus": 3,
@@ -462,6 +462,14 @@ class SolvingConfig(BaseModel):
             "smspp-tssb": {
                 "capacity_expansion_ucblock": True,
                 "configfile": "config/smspp/TSSBlock/TSSBCfg_grb.txt",
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
+            "smspp-tssb-pips-ipmpp": {
+                "capacity_expansion_ucblock": True,
+                "configfile": "config/smspp/PIPS-IPMpp/BSCfg1-PIPS.txt",
                 "stochastic_parameters": {
                     "stochastic_type": "tssb",
                     "parameters": ["demand", "renewable_maxpower"],
