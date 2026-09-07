@@ -1,0 +1,63 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - UCBSCfg-LD-EASY.txt - - - - - - - - - - - - - -
+#
+# A txt description of a BlockSolverConfig for a UCBlock to be solved by a
+# LagrangianDualSolver (using a [Parallel]BundleSolver as the inner Solver),
+# identical to UCBSCfg-LD.txt but forcing intDoEasy = 0.
+#
+# It is meant for instances whose components are all "easy" (e.g. the
+# resilient-data instances): with intDoEasy = 1 the BundleSolver would abort
+# with "all components are easy, this is no supported", so here the base
+# ComputeConfig in config/LDCfg.txt is overridden to disable easy components.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BlockSolverConfig     # exact type of the Configuration object
+
+1  # the BlockSolverConfig is a "differential" one
+
+1  # number of (the names of) Solver in this BlockSolverConfig
+# now all the names of the Solver - - - - - - - - - - - - - - - - - - - - - -
+LagrangianDualSolver
+
+1  # number of ComputeConfig in this BlockSolverConfig
+# now all the ComputeConfig
+# the ComputeConfig of the LagrangianDualSolver (mostly the ComputeConfig of
+# its inner [Parallel]BundleSolver), with intDoEasy overridden to 0
+*LDCfg.txt +
+
+1  # f_diff == 1 ==> only the entries listed below are changed
+
+1 # number of integer parameters
+
+intDoEasy 0 # do easy components for (some) LagBFunction
+
+0 # number of double parameters
+
+# now all the double parameters
+# [none]
+
+0 # number of string parameters
+
+# now all the string parameters
+# [none]
+
+0 # number of vector-of-int parameters
+
+# now all the vector-of-int parameters
+# [none]
+
+0 # number of vector-of-double parameters
+
+# now all the vector-of-double parameters
+# [none]
+
+0 # number of vector-of-string parameters
+
+# now all the vector-of-string parameters
+# [none]
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - END UCBSCfg-LD-EASY.txt - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
