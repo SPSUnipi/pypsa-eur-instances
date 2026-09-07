@@ -1,0 +1,37 @@
+demand_scenario: &demand_scenario
+  name: modify_components
+  params:
+    rules:
+    - component: Load
+      attribute: p_set
+      target: timeseries
+      operation: scale
+      value:
+        distribution: normal
+        mean: 1.0
+        std: 0.1
+        min: 0.8
+        max: 1.2
+        seed: 123
+
+scenarios:
+  demand_01: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_02: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_03: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_04: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_05: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_06: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_07: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_08: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_09: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_10: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_11: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_12: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_13: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_14: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_15: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_16: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_17: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_18: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_19: {prob: 0.05, structured_scenario: *demand_scenario}
+  demand_20: {prob: 0.05, structured_scenario: *demand_scenario}

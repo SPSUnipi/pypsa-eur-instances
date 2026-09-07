@@ -342,6 +342,50 @@ rule make_solver_comparison_sector:
         scripts("compare_solver_results.py")
 
 
+rule make_solver_comparison_elec_tssb:
+    input:
+        networks=lambda w: expand(
+            RESULTS
+            + "networks/base_s_{clusters}_elec_{opts}_{solver}.nc",
+            clusters=w.clusters,
+            opts=w.opts,
+            solver=solver_names(w),
+            run=config["run"]["name"],
+        ),
+        benchmarks=lambda w: expand(
+            RESULTS
+            + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}",
+            clusters=w.clusters,
+            opts=w.opts,
+            solver=solver_names(w),
+            run=config["run"]["name"],
+        ),
+    output:
+        summary=RESULTS
+        + "csvs/solver_comparison/summary_s_{clusters}_elec_{opts}_tssb.csv",
+        optimal_capacity=RESULTS
+        + "csvs/solver_comparison/optimal_capacity_s_{clusters}_elec_{opts}_tssb.csv",
+        energy_balance=RESULTS
+        + "csvs/solver_comparison/energy_balance_s_{clusters}_elec_{opts}_tssb.csv",
+        benchmarks=RESULTS
+        + "csvs/solver_comparison/benchmarks_s_{clusters}_elec_{opts}_tssb.csv",
+    log:
+        RESULTS
+        + "logs/make_solver_comparison/base_s_{clusters}_elec_{opts}_tssb.log",
+    benchmark:
+        RESULTS
+        + "benchmarks/make_solver_comparison/base_s_{clusters}_elec_{opts}_tssb"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    params:
+        solver_specs=solver_run_specs,
+    message:
+        "Comparing solved stochastic TSSB electricity networks across configured solvers for {wildcards.clusters} clusters and {wildcards.opts} electric options"
+    script:
+        scripts("compare_solver_results.py")
+
+
 rule make_solver_comparison_sector_perfect:
     input:
         networks=lambda w: expand(
