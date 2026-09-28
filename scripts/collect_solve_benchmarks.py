@@ -2,11 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 """
-Collect solve benchmarks and objectives below one or more results prefixes.
+Collect solve benchmarks and objectives below results prefixes or selected case folders.
 
 python scripts/collect_solve_benchmarks.py \
     --prefix dispatch-power-IT \
     --output results/solve_benchmarks.csv
+
+python scripts/collect_solve_benchmarks.py \
+    --folder dispatch-power-IT/th_24c24 dispatch-power-IT/th_48c24 \
+    --output results/selected_solve_benchmarks.csv
 """
 
 import argparse
@@ -37,12 +41,23 @@ TIME_LIMIT_RE = re.compile(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument(
         "--prefix",
         dest="prefixes",
         nargs="+",
-        required=True,
-        help="Prefixes below --results-root to scan (for example experiment/a experiment/b).",
+        help="Prefixes below --results-root to scan recursively.",
+    )
+    selection.add_argument(
+        "--folder",
+        dest="folders",
+        nargs="+",
+        type=Path,
+        help=(
+            "Specific case folders to scan recursively. Relative paths are resolved "
+            "below --results-root; paths beginning with the results-root name and "
+            "absolute paths are also accepted."
+        ),
     )
     parser.add_argument("--results-root", default=Path("results"), type=Path)
     parser.add_argument("--output", required=True, type=Path)
@@ -161,6 +176,7 @@ def read_network_metadata(path: Path) -> dict:
             "network_file": path.as_posix(),
             "objective": ds.attrs.get("network__objective", pd.NA),
             "objective_constant": ds.attrs.get("network__objective_constant", pd.NA),
+            "scenarios": int(ds.sizes.get("scenario", 1)),
         }
         meta = ds.attrs.get("meta")
 
@@ -192,16 +208,17 @@ def read_network_metadata(path: Path) -> dict:
     return metadata
 
 
-def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
+def collect_benchmarks(roots: list[Path], case_folders: bool = False) -> pd.DataFrame:
     rows = []
     for root in roots:
         for path in benchmark_files(root):
             result_dir = result_directory(path)
             network_path = result_dir / "networks" / f"{path.name}.nc"
             network_metadata = read_network_metadata(network_path)
+            metadata_root = root.parent if case_folders else root
             row = {
-                "prefix": root.as_posix(),
-                "case": result_dir.relative_to(root).as_posix(),
+                "prefix": metadata_root.as_posix(),
+                "case": result_dir.relative_to(metadata_root).as_posix(),
                 "benchmark_rule": path.parent.name,
                 "benchmark_file": path.as_posix(),
             }
@@ -231,6 +248,7 @@ def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
         "opts",
         "sector_opts",
         "planning_horizons",
+        "scenarios",
         "benchmark_file",
         "network_file",
         "objective",
@@ -252,10 +270,24 @@ def collect_benchmarks(roots: list[Path]) -> pd.DataFrame:
     )
 
 
+def resolve_folder(folder: Path, results_root: Path) -> Path:
+    """Resolve a selected folder while accepting results/... paths."""
+    if folder.is_absolute():
+        return folder
+    if folder.parts and folder.parts[0] == results_root.name:
+        return folder
+    return results_root / folder
+
+
 def main() -> None:
     args = parse_args()
-    roots = [args.results_root / prefix.strip("/") for prefix in args.prefixes]
-    df = collect_benchmarks(roots)
+    if args.prefixes:
+        roots = [args.results_root / prefix.strip("/") for prefix in args.prefixes]
+        case_folders = False
+    else:
+        roots = [resolve_folder(folder, args.results_root) for folder in args.folders]
+        case_folders = True
+    df = collect_benchmarks(roots, case_folders=case_folders)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.output, index=False)
     logger.info("Collected %s solve benchmark rows into %s", len(df), args.output)
