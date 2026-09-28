@@ -467,6 +467,17 @@ class SolvingConfig(BaseModel):
                     "parameters": ["demand", "renewable_maxpower"],
                 },
             },
+            "smspp-tssb-bds": {
+                "capacity_expansion_ucblock": True,
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-BDS.txt",
+                "pysmspp_options": {
+                    "k": None,
+                },
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
             "smspp-tssb-pips-ipmpp": {
                 "capacity_expansion_ucblock": True,
                 "configfile": "config/smspp/PIPS-IPMpp/BSCfg1-PIPS.txt",
