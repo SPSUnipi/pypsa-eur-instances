@@ -11,6 +11,10 @@ th_24c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_24c24_demand
+      smspp-tssb-lds: *th_24c24_demand
+      smspp-tssb-ldld: *th_24c24_demand
+      smspp-tssb-ldrec: *th_24c24_demand
+      smspp-tssb-pph: *th_24c24_demand
 
 th_48c24_demand:
   clustering:
@@ -25,6 +29,10 @@ th_48c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_48c24_demand
+      smspp-tssb-lds: *th_48c24_demand
+      smspp-tssb-ldld: *th_48c24_demand
+      smspp-tssb-ldrec: *th_48c24_demand
+      smspp-tssb-pph: *th_48c24_demand
 
 th_168c24_demand:
   clustering:
@@ -39,6 +47,10 @@ th_168c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_168c24_demand
+      smspp-tssb-lds: *th_168c24_demand
+      smspp-tssb-ldld: *th_168c24_demand
+      smspp-tssb-ldrec: *th_168c24_demand
+      smspp-tssb-pph: *th_168c24_demand
 
 th_365c24_demand:
   clustering:
@@ -53,6 +65,10 @@ th_365c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_365c24_demand
+      smspp-tssb-lds: *th_365c24_demand
+      smspp-tssb-ldld: *th_365c24_demand
+      smspp-tssb-ldrec: *th_365c24_demand
+      smspp-tssb-pph: *th_365c24_demand
 
 th_24c24_renewable:
   clustering:
@@ -67,6 +83,10 @@ th_24c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_24c24_renewable
+      smspp-tssb-lds: *th_24c24_renewable
+      smspp-tssb-ldld: *th_24c24_renewable
+      smspp-tssb-ldrec: *th_24c24_renewable
+      smspp-tssb-pph: *th_24c24_renewable
 
 th_48c24_renewable:
   clustering:
@@ -81,6 +101,10 @@ th_48c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_48c24_renewable
+      smspp-tssb-lds: *th_48c24_renewable
+      smspp-tssb-ldld: *th_48c24_renewable
+      smspp-tssb-ldrec: *th_48c24_renewable
+      smspp-tssb-pph: *th_48c24_renewable
 
 th_168c24_renewable:
   clustering:
@@ -95,6 +119,10 @@ th_168c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_168c24_renewable
+      smspp-tssb-lds: *th_168c24_renewable
+      smspp-tssb-ldld: *th_168c24_renewable
+      smspp-tssb-ldrec: *th_168c24_renewable
+      smspp-tssb-pph: *th_168c24_renewable
 
 th_365c24_renewable:
   clustering:
@@ -109,3 +137,7 @@ th_365c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_365c24_renewable
+      smspp-tssb-lds: *th_365c24_renewable
+      smspp-tssb-ldld: *th_365c24_renewable
+      smspp-tssb-ldrec: *th_365c24_renewable
+      smspp-tssb-pph: *th_365c24_renewable

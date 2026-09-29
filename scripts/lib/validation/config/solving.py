@@ -478,6 +478,54 @@ class SolvingConfig(BaseModel):
                     "parameters": ["demand", "renewable_maxpower"],
                 },
             },
+            "smspp-tssb-lds": {
+                "capacity_expansion_ucblock": True,
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-LD-IP.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg.txt",
+                },
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
+            "smspp-tssb-ldld": {
+                "capacity_expansion_ucblock": True,
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-LDLD.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg.txt",
+                },
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
+            "smspp-tssb-ldrec": {
+                "capacity_expansion_ucblock": True,
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-LDrec.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg.txt",
+                },
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
+            "smspp-tssb-pph": {
+                "capacity_expansion_ucblock": True,
+                "enable_thermal_units": True,
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-PPH.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg.txt",
+                },
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
             "smspp-tssb-pips-ipmpp": {
                 "capacity_expansion_ucblock": True,
                 "configfile": "config/smspp/PIPS-IPMpp/BSCfg1-PIPS.txt",
