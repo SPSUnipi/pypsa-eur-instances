@@ -40,3 +40,13 @@ run-instances-tssb:
 run-instances:
 	$(MAKE) run-instances-elec
 	$(MAKE) run-instances-sector
+
+.PHONY: compare-solver-outputs
+
+# Run from the Snakemake workflow directory containing Snakefile and config/.
+# Each command must succeed before the next comparison starts, even with make -j.
+compare-solver-outputs:
+	snakemake -j64 compare_solver_elec_outputs --configfile config/instances/capacity-expansion/power-IT-noUC.yaml
+	snakemake -j64 compare_solver_elec_outputs --configfile config/instances/capacity-expansion/power-IT-linUC.yaml
+	snakemake -j64 compare_solver_elec_outputs --configfile config/instances/capacity-expansion/power-IT-UC.yaml
+	snakemake -j64 compare_solver_elec_tssb_outputs --configfile config/instances/tssb/power-IT-noUC.yaml

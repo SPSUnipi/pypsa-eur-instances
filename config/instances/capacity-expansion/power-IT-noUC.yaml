@@ -16,7 +16,7 @@ foresight: overnight
 
 scenario:
   clusters:
-  - 2
+  - 5
   - 20
   - 50
   opts:

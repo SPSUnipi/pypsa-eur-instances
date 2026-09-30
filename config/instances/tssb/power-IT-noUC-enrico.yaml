@@ -2,7 +2,7 @@
 
 run:
   prefix: "capacity-expansion-tssb-power-IT-noUC"
-  name: th_24c24_demand_20
+  name: all
   scenarios:
     enable: true
     file: config/instances/scenarios/tssb/scenarios-power-enrico.yaml
@@ -17,8 +17,8 @@ foresight: overnight
 scenario:
   clusters:
   - 2
-  #- 10
-  #- 20
+  - 10
+  - 20
   #- 50
 
   opts:
