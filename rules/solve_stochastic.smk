@@ -102,6 +102,8 @@ rule solve_sector_network:
         + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_memory.log",
         python=RESULTS
         + "logs/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}_python.log",
+        failure_benchmark=RESULTS
+        + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_{planning_horizons}_{solver}.failed",
     benchmark:
         (
             RESULTS
@@ -123,7 +125,7 @@ rule solve_sector_network:
     message:
         "Solving stochastic sector-coupled network with overnight investment optimization using {wildcards.solver} for {wildcards.clusters} clusters, {wildcards.planning_horizons} planning horizons, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
     script:
-        scripts("solve_network.py")
+        scripts("solve_network_supervisor.py")
 
 
 if config["stochastic_scenarios"]["export"]["average"]:

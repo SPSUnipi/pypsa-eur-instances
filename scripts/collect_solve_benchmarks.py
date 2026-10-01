@@ -118,10 +118,22 @@ def benchmark_files(root: Path) -> list[Path]:
     paths: list[Path] = []
     for rule_dir in ["solve_network", "solve_sector_network"]:
         paths.extend(root.glob(f"**/benchmarks/{rule_dir}/*"))
+    # Snakemake creates empty placeholders for unused log files on success.
+    failures = {
+        path
+        for path in paths
+        if path.is_file() and path.name.endswith(".failed") and path.stat().st_size
+    }
     return sorted(
         path
         for path in paths
-        if path.is_file() and not path.name.endswith(SMSPP_BENCHMARK_SUFFIX)
+        if path.is_file()
+        and not path.name.endswith(SMSPP_BENCHMARK_SUFFIX)
+        and (
+            path in failures
+            if path.name.endswith(".failed")
+            else path.with_name(path.name + ".failed") not in failures
+        )
     )
 
 
@@ -135,6 +147,8 @@ def read_solve_outcome(path: Path, configured_time_limit: object = pd.NA) -> dic
     log_path = (
         result_directory(path) / "logs" / path.parent.name / f"{path.name}_python.log"
     )
+    if not log_path.exists():
+        log_path = result_directory(path) / "logs" / f"{path.name}_python.log"
     metadata = {
         "solve_status": pd.NA,
         "termination_condition": pd.NA,
@@ -211,22 +225,24 @@ def read_network_metadata(path: Path) -> dict:
 def collect_benchmarks(roots: list[Path], case_folders: bool = False) -> pd.DataFrame:
     rows = []
     for root in roots:
-        for path in benchmark_files(root):
+        for benchmark_path in benchmark_files(root):
+            failed = benchmark_path.name.endswith(".failed")
+            path = benchmark_path.with_name(benchmark_path.name.removesuffix(".failed"))
             result_dir = result_directory(path)
             network_path = result_dir / "networks" / f"{path.name}.nc"
-            network_metadata = read_network_metadata(network_path)
+            network_metadata = {} if failed else read_network_metadata(network_path)
             metadata_root = root.parent if case_folders else root
             row = {
                 "prefix": metadata_root.as_posix(),
                 "case": result_dir.relative_to(metadata_root).as_posix(),
                 "benchmark_rule": path.parent.name,
-                "benchmark_file": path.as_posix(),
+                "benchmark_file": benchmark_path.as_posix(),
             }
             row.update(network_metadata)
             row.update(parse_benchmark_name(path.name, row.get("solver")))
-            row.update(read_benchmark(path))
+            row.update(read_benchmark(benchmark_path))
             smspp_benchmark = path.with_name(path.name + SMSPP_BENCHMARK_SUFFIX)
-            if smspp_benchmark.exists():
+            if not failed and smspp_benchmark.exists():
                 smspp_timings = read_benchmark(smspp_benchmark)
                 row["smspp_optimization_s"] = smspp_timings["s"]
                 row["smspp_computational_s"] = smspp_timings.get(
@@ -264,7 +280,7 @@ def collect_benchmarks(roots: list[Path], case_folders: bool = False) -> pd.Data
     remaining_columns = [
         column for column in df.columns if column not in leading_columns
     ]
-    return df[leading_columns + remaining_columns].sort_values(
+    return df.reindex(columns=leading_columns + remaining_columns).sort_values(
         ["prefix", "case", "benchmark_rule", "case_result", "solver"],
         na_position="last",
     )

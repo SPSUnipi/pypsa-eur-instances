@@ -112,6 +112,8 @@ rule solve_sector_network_perfect:
         + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}_python.log",
         memory=RESULTS
         + "logs/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}_memory.log",
+        failure_benchmark=RESULTS
+        + "benchmarks/solve_sector_network/base_s_{clusters}_{opts}_{sector_opts}_brownfield_all_years_{solver}.failed",
     benchmark:
         (
             RESULTS
@@ -134,7 +136,7 @@ rule solve_sector_network_perfect:
     message:
         "Solving sector-coupled network with perfect foresight using {wildcards.solver} for {wildcards.clusters} clusters, {wildcards.opts} electric options and {wildcards.sector_opts} sector options"
     script:
-        scripts("solve_network.py")
+        scripts("solve_network_supervisor.py")
 
 
 def input_networks_make_summary_perfect(w):
