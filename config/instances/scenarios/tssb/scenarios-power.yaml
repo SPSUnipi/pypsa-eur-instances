@@ -11,6 +11,11 @@ th_24c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_24c24_demand
+      smspp-tssb-lds-lp: *th_24c24_demand
+      smspp-tssb-bds-ld: *th_24c24_demand
+      smspp-tssb-bds-cvx-ld: *th_24c24_demand
+      smspp-tssb-ib: *th_24c24_demand
+      smspp-tssb-ib-ld: *th_24c24_demand
       smspp-tssb-lds: *th_24c24_demand
       smspp-tssb-ldld: *th_24c24_demand
       smspp-tssb-ldrec: *th_24c24_demand
@@ -29,6 +34,11 @@ th_48c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_48c24_demand
+      smspp-tssb-lds-lp: *th_48c24_demand
+      smspp-tssb-bds-ld: *th_48c24_demand
+      smspp-tssb-bds-cvx-ld: *th_48c24_demand
+      smspp-tssb-ib: *th_48c24_demand
+      smspp-tssb-ib-ld: *th_48c24_demand
       smspp-tssb-lds: *th_48c24_demand
       smspp-tssb-ldld: *th_48c24_demand
       smspp-tssb-ldrec: *th_48c24_demand
@@ -47,6 +57,11 @@ th_168c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_168c24_demand
+      smspp-tssb-lds-lp: *th_168c24_demand
+      smspp-tssb-bds-ld: *th_168c24_demand
+      smspp-tssb-bds-cvx-ld: *th_168c24_demand
+      smspp-tssb-ib: *th_168c24_demand
+      smspp-tssb-ib-ld: *th_168c24_demand
       smspp-tssb-lds: *th_168c24_demand
       smspp-tssb-ldld: *th_168c24_demand
       smspp-tssb-ldrec: *th_168c24_demand
@@ -65,6 +80,11 @@ th_365c24_demand:
           parameters:
           - demand
       smspp-tssb-bds: *th_365c24_demand
+      smspp-tssb-lds-lp: *th_365c24_demand
+      smspp-tssb-bds-ld: *th_365c24_demand
+      smspp-tssb-bds-cvx-ld: *th_365c24_demand
+      smspp-tssb-ib: *th_365c24_demand
+      smspp-tssb-ib-ld: *th_365c24_demand
       smspp-tssb-lds: *th_365c24_demand
       smspp-tssb-ldld: *th_365c24_demand
       smspp-tssb-ldrec: *th_365c24_demand
@@ -83,6 +103,11 @@ th_24c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_24c24_renewable
+      smspp-tssb-lds-lp: *th_24c24_renewable
+      smspp-tssb-bds-ld: *th_24c24_renewable
+      smspp-tssb-bds-cvx-ld: *th_24c24_renewable
+      smspp-tssb-ib: *th_24c24_renewable
+      smspp-tssb-ib-ld: *th_24c24_renewable
       smspp-tssb-lds: *th_24c24_renewable
       smspp-tssb-ldld: *th_24c24_renewable
       smspp-tssb-ldrec: *th_24c24_renewable
@@ -101,6 +126,11 @@ th_48c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_48c24_renewable
+      smspp-tssb-lds-lp: *th_48c24_renewable
+      smspp-tssb-bds-ld: *th_48c24_renewable
+      smspp-tssb-bds-cvx-ld: *th_48c24_renewable
+      smspp-tssb-ib: *th_48c24_renewable
+      smspp-tssb-ib-ld: *th_48c24_renewable
       smspp-tssb-lds: *th_48c24_renewable
       smspp-tssb-ldld: *th_48c24_renewable
       smspp-tssb-ldrec: *th_48c24_renewable
@@ -119,6 +149,11 @@ th_168c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_168c24_renewable
+      smspp-tssb-lds-lp: *th_168c24_renewable
+      smspp-tssb-bds-ld: *th_168c24_renewable
+      smspp-tssb-bds-cvx-ld: *th_168c24_renewable
+      smspp-tssb-ib: *th_168c24_renewable
+      smspp-tssb-ib-ld: *th_168c24_renewable
       smspp-tssb-lds: *th_168c24_renewable
       smspp-tssb-ldld: *th_168c24_renewable
       smspp-tssb-ldrec: *th_168c24_renewable
@@ -137,6 +172,11 @@ th_365c24_renewable:
           parameters:
           - renewable_maxpower
       smspp-tssb-bds: *th_365c24_renewable
+      smspp-tssb-lds-lp: *th_365c24_renewable
+      smspp-tssb-bds-ld: *th_365c24_renewable
+      smspp-tssb-bds-cvx-ld: *th_365c24_renewable
+      smspp-tssb-ib: *th_365c24_renewable
+      smspp-tssb-ib-ld: *th_365c24_renewable
       smspp-tssb-lds: *th_365c24_renewable
       smspp-tssb-ldld: *th_365c24_renewable
       smspp-tssb-ldrec: *th_365c24_renewable
