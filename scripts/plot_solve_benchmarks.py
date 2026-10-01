@@ -27,7 +27,7 @@ from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter
 logger = logging.getLogger(__name__)
 
 TIME_RESOLUTION_RE = re.compile(
-    r"(?:^|/)th_(?P<periods>\d+)c(?P<hours>\d+)(?P<variant>__[^/]+)?(?:$|/)"
+    r"(?:^|/)th_(?P<periods>\d+)c(?P<hours>\d+)(?P<variant>_[^/]*)?(?:\Z|/)"
 )
 REQUIRED_COLUMNS = {
     "case",
@@ -42,6 +42,16 @@ OUTCOME_STYLES = {
     "time_limit": {"marker": "X", "label": "Time limit", "size": 130},
 }
 SOLVED_POINT_SIZE = 75
+SMSPP_TIMING_STYLES = {
+    "smspp_computational_s": {
+        "label": "SMS++ computational",
+        "linestyle": "--",
+    },
+    "smspp_optimization_s": {
+        "label": "SMS++ subprocess",
+        "linestyle": ":",
+    },
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -85,11 +95,21 @@ def parse_time_resolution(case: object) -> tuple[int, int] | None:
 
 
 def parse_case_variant(case: object) -> str:
-    """Extract the discriminator after ``__`` in a time-resolution component."""
+    """Extract the non-numeric suffix after a time-resolution component."""
     match = TIME_RESOLUTION_RE.search(str(case))
     if match is None or match["variant"] is None:
         return ""
-    return match["variant"][2:]
+    variant = match["variant"].lstrip("_")
+    return re.sub(r"_\d+\Z", "", variant)
+
+
+def parse_scenario_count(case: object) -> int:
+    """Infer a trailing scenario count for CSVs without a scenarios column."""
+    match = TIME_RESOLUTION_RE.search(str(case))
+    if match is None or match["variant"] is None:
+        return 1
+    scenario_match = re.search(r"_(\d+)\Z", match["variant"])
+    return int(scenario_match[1]) if scenario_match else 1
 
 
 def prepare_data(path: Path) -> pd.DataFrame:
@@ -116,9 +136,18 @@ def prepare_data(path: Path) -> pd.DataFrame:
         parsed.dropna().tolist(), index=data.index
     )
     data["case_variant"] = data["case"].map(parse_case_variant)
+    inferred_scenarios = data["case"].map(parse_scenario_count)
+    data["scenarios"] = pd.to_numeric(
+        data.get("scenarios", inferred_scenarios), errors="coerce"
+    ).fillna(inferred_scenarios)
     data["modeled_hours"] = data["periods"] * data["hours_per_period"]
     data["clusters"] = pd.to_numeric(data["clusters"], errors="coerce")
     data["runtime_s"] = pd.to_numeric(data["s"], errors="coerce")
+    for column in SMSPP_TIMING_STYLES:
+        data[column] = pd.to_numeric(
+            data.get(column, pd.Series(index=data.index, dtype=float)),
+            errors="coerce",
+        )
     data["objective"] = pd.to_numeric(data["objective"], errors="coerce")
     data["objective_constant"] = pd.to_numeric(
         data["objective_constant"], errors="coerce"
@@ -171,6 +200,7 @@ def prepare_data(path: Path) -> pd.DataFrame:
     # Repeated runs of the same configuration are summarized robustly.
     group_columns = [
         "case_variant",
+        "scenarios",
         "solver_options",
         "clusters",
         "periods",
@@ -180,7 +210,7 @@ def prepare_data(path: Path) -> pd.DataFrame:
     ]
     return (
         data.groupby(group_columns, as_index=False, dropna=False)[
-            ["runtime_s", "objective"]
+            ["runtime_s", *SMSPP_TIMING_STYLES, "objective"]
         ]
         .median()
         .sort_values(["periods", "hours_per_period", "clusters", "solver_options"])
@@ -250,6 +280,19 @@ def draw_series(
             linewidth=2,
             label=solver,
         )
+        if y == "runtime_s":
+            for timing_column, timing_style in SMSPP_TIMING_STYLES.items():
+                timing_subset = subset.dropna(subset=[timing_column])
+                if timing_subset.empty:
+                    continue
+                ax.plot(
+                    timing_subset[x],
+                    timing_subset[timing_column],
+                    color=colors[solver],
+                    linestyle=timing_style["linestyle"],
+                    marker=None,
+                    linewidth=2,
+                )
         for outcome, outcome_subset in subset.groupby("outcome"):
             style = OUTCOME_STYLES.get(
                 outcome, {"marker": "o", "size": SOLVED_POINT_SIZE}
@@ -276,6 +319,22 @@ def figure_legend(
         Line2D([], [], color=colors[s], marker="o", linewidth=2, label=s)
         for s in solvers
     ]
+    if any(data[column].notna().any() for column in SMSPP_TIMING_STYLES):
+        handles.append(
+            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total")
+        )
+        for column, style in SMSPP_TIMING_STYLES.items():
+            if data[column].notna().any():
+                handles.append(
+                    Line2D(
+                        [],
+                        [],
+                        color="#444444",
+                        linestyle=style["linestyle"],
+                        linewidth=2,
+                        label=style["label"],
+                    )
+                )
     for outcome, style in OUTCOME_STYLES.items():
         if outcome in data["outcome"].values:
             handles.append(
@@ -294,7 +353,7 @@ def figure_legend(
         loc="outside lower center",
         ncols=min(len(handles), 4),
         frameon=False,
-        title="Solver options / outcome",
+        title="Solver options / timing / outcome",
     )
 
 
@@ -482,12 +541,28 @@ def main() -> None:
     data = prepare_data(args.input)
     all_solvers = sorted(data["solver_options"].unique())
     colors = solver_colors(all_solvers)
-    variants = list(data["case_variant"].drop_duplicates())
-    qualify_stems = len(variants) > 1 or any(variants)
-    for variant in variants:
-        variant_data = data.loc[data["case_variant"] == variant].copy()
-        stem_suffix = f"_{variant_slug(variant)}" if qualify_stems else ""
-        plot_case(variant_data, args, output_dir, colors, stem_suffix, variant)
+    case_dimensions = (
+        data[["case_variant", "scenarios"]]
+        .drop_duplicates()
+        .sort_values(["case_variant", "scenarios"])
+    )
+    qualify_stems = (
+        len(case_dimensions) > 1
+        or any(case_dimensions["case_variant"])
+        or any(case_dimensions["scenarios"] != 1)
+    )
+    for variant, scenarios in case_dimensions.itertuples(index=False, name=None):
+        variant_data = data.loc[
+            (data["case_variant"] == variant) & (data["scenarios"] == scenarios)
+        ].copy()
+        scenario_label = f"{scenarios:g} scenario" + ("" if scenarios == 1 else "s")
+        title_parts = [part for part in (variant, scenario_label) if part]
+        title_suffix = " — ".join(title_parts)
+        stem_parts = [variant_slug(variant)] if variant else []
+        if scenarios != 1:
+            stem_parts.append(f"scenarios_{scenarios:g}")
+        stem_suffix = "_" + "_".join(stem_parts) if qualify_stems else ""
+        plot_case(variant_data, args, output_dir, colors, stem_suffix, title_suffix)
 
 
 if __name__ == "__main__":

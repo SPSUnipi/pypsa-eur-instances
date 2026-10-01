@@ -36,6 +36,8 @@ rule solve_network:
         runtime=config_provider("solving", "runtime", default="6h"),
     params:
         solving=solving_for_solver,
+        smspp_benchmark=RESULTS
+        + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}.smspp",
         foresight=config_provider("foresight"),
         co2_sequestration_potential=config_provider(
             "sector", "co2_sequestration_potential", default=200

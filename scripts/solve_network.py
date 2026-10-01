@@ -32,6 +32,7 @@ import logging
 import os
 import re
 import sys
+from datetime import timedelta
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -57,6 +58,19 @@ from scripts._helpers import (
 
 logger = logging.getLogger(__name__)
 SMSPP_SOLVER_NAME = "smspp"
+BENCHMARK_COLUMNS = [
+    "s",
+    "h:m:s",
+    "computational_time",
+    "max_rss",
+    "max_vms",
+    "max_uss",
+    "max_pss",
+    "io_in",
+    "io_out",
+    "mean_load",
+    "cpu_time",
+]
 
 # Allow for PyPSA versions <0.35
 if PYPSA_V1:
@@ -214,6 +228,7 @@ def run_smspp_optimization(
     n: pypsa.Network,
     solve_kwargs: dict,
     output_network: str | None = None,
+    benchmark_path: str | Path | None = None,
 ) -> tuple[str, str]:
     """Create and solve an SMS++ model for a PyPSA network."""
     solver_options, verbose = resolve_smspp_solver_options(
@@ -224,7 +239,41 @@ def run_smspp_optimization(
     n.optimize.smspp.create_model(solver_options=solver_options, verbose=verbose)
 
     logger.info("Solving SMS++ model...")
-    return n.optimize.smspp.solve_model(verbose=verbose)
+    status, condition = n.optimize.smspp.solve_model(verbose=verbose)
+
+    if benchmark_path is not None:
+        result = n.optimize.smspp.result
+        write_smspp_benchmark(
+            benchmark_path,
+            subprocess_time=result.subprocess_time,
+            computational_time=result.computational_time,
+        )
+
+    return status, condition
+
+
+def write_smspp_benchmark(
+    path: str | Path,
+    subprocess_time: float,
+    computational_time: float,
+) -> None:
+    """Write PySMS++ optimization timings in Snakemake benchmark format."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    subprocess_time = float(subprocess_time)
+    computational_time = float(computational_time)
+    values = {
+        "s": f"{subprocess_time:.2f}",
+        "h:m:s": str(timedelta(seconds=int(subprocess_time))),
+        "computational_time": f"{computational_time:.2f}",
+        **dict.fromkeys(BENCHMARK_COLUMNS[3:], "NA"),
+    }
+    pd.DataFrame([values], columns=BENCHMARK_COLUMNS).to_csv(
+        path,
+        sep="\t",
+        index=False,
+    )
+    logger.info("SMS++ optimization benchmark written to %s", path)
 
 
 def add_land_use_constraint_perfect(n: pypsa.Network) -> None:
@@ -1981,6 +2030,7 @@ if __name__ == "__main__":
                     n,
                     solve_kwargs=solve_kwargs,
                     output_network=snakemake.output.network,
+                    benchmark_path=snakemake.params.get("smspp_benchmark"),
                 )
             else:
                 create_optimization_model(
