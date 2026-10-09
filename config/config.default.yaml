@@ -1412,6 +1412,17 @@ solving:
         parameters:
         - demand
         - renewable_maxpower
+    "smspp-tssb-ib-int":
+      capacity_expansion_ucblock: false
+      configfile: "config/smspp/TSSBlock/TSSBSCfg-IB-int.txt"
+      pysmspp_options:
+        B: InnerBCfg.txt
+      stochastic_parameters:
+        stochastic_type: tssb
+        investment_outside: true
+        parameters:
+        - demand
+        - renewable_maxpower
     "smspp-tssb-ib-ld":
       capacity_expansion_ucblock: false
       configfile: "config/smspp/TSSBlock/TSSBSCfg-IB.txt"
