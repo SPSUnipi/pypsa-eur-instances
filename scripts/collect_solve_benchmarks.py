@@ -76,6 +76,14 @@ def parse_benchmark_name(stem: str, solver: str | None = None) -> dict:
         "sector_opts": pd.NA,
         "planning_horizons": pd.NA,
     }
+    # the cases of rules/resilient.smk: resilient_<case>, the case being a key
+    # of config["resilient"]["cases"]
+    if case_name.startswith("resilient_"):
+        metadata.update(
+            {"network_type": "resilient", "opts": case_name.removeprefix("resilient_")}
+        )
+        return metadata
+
     if not case_name.startswith("base_s_"):
         return metadata
 

@@ -2,10 +2,14 @@
 
 # The stochastic capacity expansion of the European power system in 2030 built
 # by the generator of plan4res/resilient (ENVIS NECPEssentials, 16 regions,
-# hourly steps, continuous investment, no unit commitment), from 1 to 4 weeks
-# starting on 2 July and with 21 to 105 scenarios of the demand and of the
-# availability of the renewables, solved by PyPSA with GUROBI and by SMS++ on
-# the TwoStageStochasticBlock. With the configurations of SMS++ for
+# hourly steps, continuous investment), from 1 to 4 weeks starting on 2 July
+# and with 21 to 105 scenarios of the demand and of the availability of the
+# renewables, solved by PyPSA with GUROBI and by SMS++ on the
+# TwoStageStochasticBlock. Three more cases go beyond the weeks: the first
+# day of each month of 2030, each weighing the days of its month on average
+# (y1d12_s21), the whole year of 8760 hours (y1_s21), and the first week with
+# the unit commitment of the thermal generators (w1_s21_uc), to be compared
+# with w1_s21 on the same network. With the configurations of SMS++ for
 # BundleSolver 2.0 the Benders decomposition is the option smspp-tssb-bds,
 # to be added to solving.solver.
 #
@@ -76,6 +80,30 @@ resilient:
       scenarios: 105
       extendable: true
       committable: false
+      stochastic: [demand, renewables]
+    y1d12_s21:
+      begin: 01/01/2030
+      end: 31/12/2030
+      days: [01/01/2030, 01/02/2030, 01/03/2030, 01/04/2030, 01/05/2030,
+             01/06/2030, 01/07/2030, 01/08/2030, 01/09/2030, 01/10/2030,
+             01/11/2030, 01/12/2030]
+      scenarios: 21
+      extendable: true
+      committable: false
+      stochastic: [demand, renewables]
+    y1_s21:
+      begin: 01/01/2030
+      end: 31/12/2030
+      scenarios: 21
+      extendable: true
+      committable: false
+      stochastic: [demand, renewables]
+    w1_s21_uc:
+      begin: 02/07/2030
+      end: 08/07/2030
+      scenarios: 21
+      extendable: true
+      committable: true
       stochastic: [demand, renewables]
 
 solving:

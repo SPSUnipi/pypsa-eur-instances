@@ -14,6 +14,14 @@ the first ``scenarios`` scenarios of the generator, all equally likely, on the
 data that ``stochastic`` lists: the demand, the availability of the renewable
 generators, or both.
 
+With ``days`` only those days of the horizon are kept, e.g., the first day of
+each month of a year, which the generator cannot build by itself since it takes
+a continuous interval: the whole horizon is built, the hours of the other days
+are dropped, and each hour kept weighs as many hours as the horizon has days
+over the days kept, so that the operating costs stay on the scale of the yearly
+investment costs. The days kept follow one another, so that a storage passes
+from the end of a day to the beginning of the next one kept.
+
 The inflows of the hydro reservoirs stay those of the deterministic network:
 the SMS++ conversion of a stochastic network has no stochastic inflows, and the
 two sides of a comparison have to solve the same problem.
@@ -32,6 +40,7 @@ Relevant settings
           extendable:   # capacity expansion of the generators
           committable:  # unit commitment of the thermal generators
           stochastic:   # what the scenarios change: [demand, renewables]
+          days:         # optional, the days of the horizon kept, dd/mm/yyyy
 
 Outputs
 -------
@@ -144,6 +153,19 @@ if __name__ == "__main__":
             for sc in scenarios:
                 p_set.loc[:, (sc, f"Load_{b}")] = g["DemandScenarios"][b][sc]
         n.c.loads.dynamic.p_set = p_set
+
+    if case.get("days"):
+        kept = pd.to_datetime(case["days"], dayfirst=True)
+        day = n.snapshots.normalize()
+        missing = kept.difference(day.unique())
+        if not missing.empty:
+            raise ValueError(
+                f"days {[d.strftime('%d/%m/%Y') for d in missing]} are not in "
+                f"the horizon {case['begin']} - {case['end']}"
+            )
+        weight = day.unique().size / kept.unique().size
+        n.set_snapshots(n.snapshots[day.isin(kept)])
+        n.snapshot_weightings.loc[:, :] = n.snapshot_weightings * weight
 
     os.makedirs(os.path.dirname(output), exist_ok=True)
     n.export_to_netcdf(output)
