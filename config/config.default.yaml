@@ -1332,7 +1332,7 @@ solving:
       configfile: "config/smspp/TSSBlock/TSSBSCfg-BDS.txt"
       pysmspp_options:
         k:
-        v2:  # -v2: the log of the BendersDecompositionSolver, a line per round
+        v2:
       stochastic_parameters:
         stochastic_type: tssb
         parameters:
@@ -1343,7 +1343,7 @@ solving:
       configfile: "config/smspp/TSSBlock/TSSBSCfg-BDS-CVX-pre.txt"
       pysmspp_options:
         k:
-        v2:  # -v2: the log of the BendersDecompositionSolver, a line per round
+        v2:
       stochastic_parameters:
         stochastic_type: tssb
         parameters:
