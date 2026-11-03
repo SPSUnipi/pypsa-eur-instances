@@ -49,4 +49,4 @@ solving:
     noisy_costs: false
   solver:
     name: [gurobi, smspp, smspp, smspp]
-    options: [gurobi-default, smspp-tssb, smspp-tssb-bds, smspp-tssb-ib]
+    options: [gurobi-default, smspp-tssb, smspp-tssb-bds, smspp-tssb-ib-par]
