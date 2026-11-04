@@ -2,7 +2,7 @@
 
 run:
   prefix: "capacity-expansion-tssb-power-IT-noUC"
-  name: all
+  name: th_120c24_demand_20
   scenarios:
     enable: true
     file: config/instances/scenarios/tssb/scenarios-power.yaml
@@ -16,9 +16,7 @@ foresight: overnight
 
 scenario:
   clusters:
-  - 5
   - 20
-  - 50
 
   opts:
   - ''
@@ -49,5 +47,5 @@ solving:
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-tssb, smspp-tssb-bds]
+    name: [gurobi, smspp, smspp, smspp]
+    options: [gurobi-default, smspp-tssb, smspp-tssb-bds, smspp-tssb-ib-par]
