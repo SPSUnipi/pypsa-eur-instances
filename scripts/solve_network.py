@@ -2073,6 +2073,9 @@ if __name__ == "__main__":
             logger.warning(
                 f"Solving status '{status}' with termination condition '{condition}'"
             )
+            raise RuntimeError(
+                f"Optimization failed ({status}: {condition}). Discarding solution."
+            )
         check_objective_value(n, snakemake.params.solving)
 
     if "warning" in condition:

@@ -26,6 +26,8 @@ rule solve_network:
         + "logs/solve_network/base_s_{clusters}_elec_{opts}_{solver}_memory.log",
         python=RESULTS
         + "logs/solve_network/base_s_{clusters}_elec_{opts}_{solver}_python.log",
+        failure_benchmark=RESULTS
+        + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}.failed",
     benchmark:
         (RESULTS + "benchmarks/solve_network/base_s_{clusters}_elec_{opts}_{solver}")
     shadow:
@@ -46,7 +48,7 @@ rule solve_network:
     message:
         "Solving electricity network optimization with {wildcards.solver} for {wildcards.clusters} clusters and {wildcards.opts} electric options"
     script:
-        scripts("solve_network.py")
+        scripts("solve_network_supervisor.py")
 
 
 rule solve_operations_network:
