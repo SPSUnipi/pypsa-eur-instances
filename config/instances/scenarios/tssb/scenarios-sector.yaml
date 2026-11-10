@@ -1,4 +1,4 @@
-th_24c24_demand:
+th_24c24_demand_20:
   clustering:
     temporal:
       resolution_sector: 24c24
@@ -17,7 +17,7 @@ th_24c24_demand:
       smspp-tssb-ib: *th_24c24_demand
       smspp-tssb-ib-ld: *th_24c24_demand
 
-th_120c24_demand:
+th_120c24_demand_20:
   clustering:
     temporal:
       resolution_sector: 120c24

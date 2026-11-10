@@ -1,0 +1,45 @@
+BlockSolverConfig # The name of the configuration
+
+1  # The BlockSolverConfig is "differential"
+1  # The number of Solvers
+
+# now all the names of the Solver - - - - - - - - - - - - - - - - - - - - - -
+GRBMILPSolver
+
+1  # The number of ComputeConfigs
+
+# now all the ComputeConfigs
+# 1st --------------------------------------
+ComputeConfig  # Type of the object
+1  # differential
+
+8  # Number of integer parameters
+intLogVerb 1
+Method 2      # barrier: the default concurrent LP races the dual simplex
+              # against it and leaves it a third of the cores
+Crossover 0   # a basis is not needed on the root relaxation
+PreDual 0     # solve the primal, never dualize
+AggFill 0     # no fill-in from presolve aggregation: it halves the nonzeros
+              # of the barrier factorization
+Seed 123      # so that two runs are comparable
+Threads 32    # the same core count the reference run is given
+GURO_PAR_BARDENSETHRESH 200  # how dense a column has to be to be treated
+              # as such, the value PyPSA passes
+
+2  # Number of double parameters
+#dblAAccSol 1e-08
+#dblRAccSol 1e-08
+dblMaxTime 43200.0
+# BarConvTol 1e-05   # the accuracy the reference run asks for
+dblRelAcc  1e-3
+
+0  # Number of string parameters
+# strOutputFile uc_lp.lp
+
+0 # number of vector-of-int parameters
+0 # number of vector-of-double parameters
+0 # number of vector-of-string parameters
+
+# Pointer to the "extra" Configuration
+* # [none]
+# 1st END ----------------------------------

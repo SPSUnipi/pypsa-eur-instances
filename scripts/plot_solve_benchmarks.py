@@ -38,18 +38,15 @@ REQUIRED_COLUMNS = {
     "objective_constant",
 }
 OUTCOME_STYLES = {
+    "failed": {"marker": "X", "label": "Failed", "size": 100},
     "infeasible": {"marker": "P", "label": "Infeasible", "size": 100},
     "time_limit": {"marker": "X", "label": "Time limit", "size": 130},
 }
 SOLVED_POINT_SIZE = 75
 SMSPP_TIMING_STYLES = {
     "smspp_computational_s": {
-        "label": "SMS++ computational",
+        "label": "SMS++ compute time",
         "linestyle": "--",
-    },
-    "smspp_optimization_s": {
-        "label": "SMS++ subprocess",
-        "linestyle": ":",
     },
 }
 
@@ -183,7 +180,8 @@ def prepare_data(path: Path) -> pd.DataFrame:
         .fillna("")
         .str.endswith(".failed")
     )
-    data.loc[failed | time_limited, "outcome"] = "time_limit"
+    data.loc[failed, "outcome"] = "failed"
+    data.loc[time_limited, "outcome"] = "time_limit"
     missing_limits = time_limited & data["time_limit_s"].isna()
     if missing_limits.any():
         logger.warning(
@@ -281,7 +279,7 @@ def draw_series(
         if subset.empty:
             continue
         # A time-limit point is an isolated observation, not part of a trend line.
-        connected_y = subset[y].where(subset["outcome"] != "time_limit")
+        connected_y = subset[y].where(~subset["outcome"].isin(["time_limit", "failed"]))
         ax.plot(
             subset[x],
             connected_y,
@@ -300,7 +298,7 @@ def draw_series(
                     timing_subset[timing_column],
                     color=colors[solver],
                     linestyle=timing_style["linestyle"],
-                    marker=None,
+                    marker="s",
                     linewidth=2,
                 )
         for outcome, outcome_subset in subset.groupby("outcome"):
@@ -331,7 +329,7 @@ def figure_legend(
     ]
     if any(data[column].notna().any() for column in SMSPP_TIMING_STYLES):
         handles.append(
-            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total")
+            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total time (benchmark)")
         )
         for column, style in SMSPP_TIMING_STYLES.items():
             if data[column].notna().any():
@@ -523,6 +521,7 @@ def plot_case(
             f" for case variant {title_suffix}" if title_suffix else "",
         )
     objective_data = data.loc[valid_objective].copy()
+    objective_data[list(SMSPP_TIMING_STYLES)] = float("nan")
     if objective_data.empty:
         logger.warning("No numeric objective values found; skipping objective plots.")
         return

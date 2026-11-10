@@ -1287,14 +1287,14 @@ solving:
     "glpk-default": {}
     "smspp-ucblock":
       capacity_expansion_ucblock: true
-      configfile: config/smspp/UCBlockGrb/uc_solverconfig.txt
+      configfile: config/smspp/UCBlockGrb/uc_solverconfig-LP.txt
     "smspp-investmentblock":
       capacity_expansion_ucblock: false
       configfile: config/smspp/InvestmentBlockGrb/BSPar.txt
     "smspp-unitcommitment-dispatch-ucblock":
       capacity_expansion_ucblock: true
       enable_thermal_units: true
-      configfile: config/smspp/UCBlockGrb/uc_solverconfig.txt
+      configfile: config/smspp/UCBlockGrb/uc_solverconfig-MILP.txt
     "smspp-unitcommitment-dispatch-investmentblock":
       capacity_expansion_ucblock: false
       enable_thermal_units: true

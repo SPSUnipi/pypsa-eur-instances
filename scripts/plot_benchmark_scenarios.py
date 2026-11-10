@@ -1,12 +1,14 @@
 """Plot runtime and memory against scenario count at a fixed network size."""
 
 import argparse
+import math
 from pathlib import Path
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import LogFormatterSciNotation
 
 from plot_solve_benchmarks import (
     SMSPP_TIMING_STYLES,
@@ -17,6 +19,59 @@ from plot_solve_benchmarks import (
     solver_colors,
     style_axis,
 )
+
+
+def plot_relative_objective_error(data, output, nodes, periods, hours, variant, colors):
+    """Compare total objectives against the matching PyPSA/Gurobi run."""
+    reference = data.loc[
+        (data.solver_options == "gurobi-default") & (data.outcome == "solved"),
+        ["scenarios", "objective"],
+    ].rename(columns={"objective": "pypsa_objective"})
+    errors = data.loc[data.solver_options.str.startswith("smspp")].merge(
+        reference, on="scenarios", how="left", validate="many_to_one"
+    )
+    errors["relative_error"] = (
+        (errors.objective - errors.pypsa_objective)
+        / errors.pypsa_objective.where(errors.pypsa_objective != 0)
+    )
+    stem = f"benchmark_relative_objective_error_scenario_scaling_{nodes}_nodes"
+    errors[["scenarios", "solver_options", "objective", "pypsa_objective", "relative_error"]].to_csv(
+        output / f"{stem}.csv", index=False
+    )
+    valid = errors.dropna(subset=["relative_error"]).copy()
+    if valid.empty:
+        return
+    for signed in (False, True):
+        fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
+        for solver, subset in valid.groupby("solver_options"):
+            subset = subset.sort_values("scenarios")
+            values = subset.relative_error
+            if not signed:
+                values = values.abs().where(values != 0)
+            ax.plot(subset.scenarios, values, marker="o", linewidth=2,
+                    color=colors[solver], label=solver)
+        style_axis(ax, False)
+        if signed:
+            # Keep the sign; only a small neighbourhood of zero is linear.
+            nonzero = valid.relative_error.abs().loc[valid.relative_error != 0]
+            threshold = (
+                10 ** math.floor(math.log10(nonzero.min()))
+                if not nonzero.empty else 1e-8
+            )
+            ax.set_yscale("symlog", linthresh=threshold)
+            ax.axhline(0, color="#777777", linewidth=0.8)
+            ax.set_ylabel("Relative objective error (SMS++ − PyPSA) / PyPSA")
+            ax.set_title(f"Signed error · symlog (linear within ±{threshold:g})", loc="left")
+        else:
+            ax.set_yscale("log")
+            ax.set_ylabel("Absolute relative objective error |(SMS++ − PyPSA) / PyPSA|")
+            ax.set_title("Absolute error · logarithmic y-axis", loc="left")
+        ax.yaxis.set_major_formatter(LogFormatterSciNotation())
+        ax.set_xticks(sorted(data.scenarios.unique()))
+        ax.set_xlabel("Number of scenarios")
+        fig.suptitle(f"{nodes} nodes · {int(periods)} × {int(hours)} h · {variant}", fontweight="bold")
+        ax.legend(frameon=False)
+        save_figure(fig, output / (stem + ("_signed" if signed else "")), ["png", "pdf"], 220)
 
 
 def main():
@@ -40,6 +95,7 @@ def main():
     )
     solvers = sorted(data.solver_options.unique())
     colors = solver_colors(solvers)
+    plot_relative_objective_error(data, output, args.nodes, periods, hours, variant, colors)
     for metric, ylabel, stem, log_scale in (
         ("runtime_s", "Wall-clock runtime [s]", "benchmark_scenario_scaling", True),
         ("memory_gib", "Peak resident memory [GiB]", "benchmark_memory_scenario_scaling", False),

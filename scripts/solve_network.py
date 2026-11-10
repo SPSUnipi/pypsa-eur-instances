@@ -1577,7 +1577,8 @@ def extra_functionality_stochastic(
             add_TES_energy_to_power_ratio_constraints(n)
             add_TES_charger_ratio_constraints(n)
 
-    add_battery_constraints(n)
+    # Disabled for the SMS++ comparison: size charger/discharger independently.
+    # add_battery_constraints(n)
 
     if n._multi_invest:
         logger.warning(
@@ -1639,9 +1640,8 @@ def extra_functionality_stochastic_minimal(
             add_TES_energy_to_power_ratio_constraints(n)
             add_TES_charger_ratio_constraints(n)
 
-    # Keep battery constraint only if the stochastic-safe version is implemented.
-    logger.info("Adding stochastic-safe battery constraints.")
-    add_battery_constraints(n)
+    # Disabled for the SMS++ comparison: size charger/discharger independently.
+    # add_battery_constraints(n)
 
     # Keep CO2 atmosphere only if the stochastic-safe version is implemented.
     if n._multi_invest:
@@ -1731,7 +1731,8 @@ def extra_functionality(
             add_TES_energy_to_power_ratio_constraints(n)
             add_TES_charger_ratio_constraints(n)
 
-    add_battery_constraints(n)
+    # Disabled for the SMS++ comparison: size charger/discharger independently.
+    # add_battery_constraints(n)
     add_lossy_bidirectional_link_constraints(n)
     add_pipe_retrofit_constraint(n)
     if n._multi_invest:
