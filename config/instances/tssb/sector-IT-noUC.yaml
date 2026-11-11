@@ -33,8 +33,39 @@ scenario:
 countries:
 - IT
 
+electricity:
+  renewable_carriers:
+  - solar
+  - onwind
+  - offwind-ac
+  - offwind-dc
+  - offwind-float
+  extendable_carriers:
+    Generator:
+    - solar
+    - onwind
+    - offwind-ac
+    - offwind-dc
+    - offwind-float
+    - OCGT
+    - CCGT
+
+# Also exclude existing solar-hsat when importing the electricity network.
+pypsa_eur:
+  Generator:
+  - onwind
+  - offwind-ac
+  - offwind-dc
+  - offwind-float
+  - solar
+  - ror
+  - nuclear
+
 sector:
   tes: false
+  # Avoid splitting bidirectional links into unsynchronised directional pairs.
+  transmission_efficiency:
+    enable: []
   land_transport_fuel_cell_share:
     2020: 0
     2025: 0

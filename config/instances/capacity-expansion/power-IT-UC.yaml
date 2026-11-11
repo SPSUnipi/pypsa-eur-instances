@@ -2,7 +2,7 @@
 
 run:
   prefix: "capacity-expansion-power-IT-UC"
-  name: th_168c24
+  name: all
   scenarios:
     enable: true
     file: config/instances/scenarios/scenarios-power.yaml
