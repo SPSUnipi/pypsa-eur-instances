@@ -181,5 +181,5 @@ test = ["test"]
 
 [pypi-dependencies]
 pypsa = { git = "https://github.com/AlessandroPampado99/PyPSA.git", branch = "smspp_optimize", extras = ["smspp"] }
-pypsa2smspp = { git = "https://github.com/sclfnc/pypsa2smspp.git", branch = "store-no-power-limit" }
+pypsa2smspp = { git = "https://github.com/sclfnc/pypsa2smspp.git", branch = "sector-store-no-power-limit" }
 pysmspp = { git = "https://github.com/SPSUnipi/pySMSpp.git", branch = "main" }

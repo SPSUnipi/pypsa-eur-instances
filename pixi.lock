@@ -635,7 +635,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/linux-64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/73/60/7138e98884ca105c76ef192f5b43165d6eac6f32b432853ebe9f09ee50c9/levenshtein-0.27.3-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/90/79/2fc252a63bc91d3c3b234d0a3a6ad4ebc460037a23cdcdaf9285f986e6c9/rapidfuzz-3.14.5-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -1181,7 +1181,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/osx-64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/11/66/252803f2010ba699618cdc048b6e1f7cc1f433c08b4a9a17579b92ab0142/rapidfuzz-3.14.5-cp313-cp313-macosx_10_13_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/3e/f2/162e9ea7490b36bbf05776c8e3a8114c75aa78546ddda8e8f36731db3da6/levenshtein-0.27.3-cp313-cp313-macosx_10_13_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -1727,7 +1727,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/osx-arm64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/01/2d/7316ba7f94e3d60e89bd120526bc71e4812866bb7162767a2a10f73f72c5/levenshtein-0.27.3-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/ea/59/b2afd98e41af9cd54554a4c1c423d84cdd60e6b1c0a09496f033b55f60ec/rapidfuzz-3.14.5-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -2267,7 +2267,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/win-64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/42/1d/74f1ff589bb687d0cad2bbdceef208dc070f56d1e38a3831da8c00bf13bb/levenshtein-0.27.3-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/cf/cb/0e251d731b3166378644238e8f0cf9e89858c024e19f75ca9f7e3ae83fd5/rapidfuzz-3.14.5-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -4382,7 +4382,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/linux-64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/73/60/7138e98884ca105c76ef192f5b43165d6eac6f32b432853ebe9f09ee50c9/levenshtein-0.27.3-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/90/79/2fc252a63bc91d3c3b234d0a3a6ad4ebc460037a23cdcdaf9285f986e6c9/rapidfuzz-3.14.5-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -4928,7 +4928,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/osx-64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/11/66/252803f2010ba699618cdc048b6e1f7cc1f433c08b4a9a17579b92ab0142/rapidfuzz-3.14.5-cp313-cp313-macosx_10_13_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/3e/f2/162e9ea7490b36bbf05776c8e3a8114c75aa78546ddda8e8f36731db3da6/levenshtein-0.27.3-cp313-cp313-macosx_10_13_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -5474,7 +5474,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/osx-arm64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/01/2d/7316ba7f94e3d60e89bd120526bc71e4812866bb7162767a2a10f73f72c5/levenshtein-0.27.3-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/ea/59/b2afd98e41af9cd54554a4c1c423d84cdd60e6b1c0a09496f033b55f60ec/rapidfuzz-3.14.5-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -6014,7 +6014,7 @@ environments:
       - conda: https://conda.anaconda.org/gurobi/win-64/gurobi-13.0.1-py313_0.conda
       - pypi: git+https://github.com/AlessandroPampado99/PyPSA.git?branch=smspp_optimize#9b47fb6dfe9fa23fb9effba1418e4607028d86a0
       - pypi: git+https://github.com/SPSUnipi/pySMSpp.git?branch=main#e474d459489bee64ba8a7461b49095ee28befb09
-      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+      - pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
       - pypi: https://files.pythonhosted.org/packages/42/1d/74f1ff589bb687d0cad2bbdceef208dc070f56d1e38a3831da8c00bf13bb/levenshtein-0.27.3-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/cf/cb/0e251d731b3166378644238e8f0cf9e89858c024e19f75ca9f7e3ae83fd5/rapidfuzz-3.14.5-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/6e/3e955517e22cbdd565f2f8b2e73d52528b14b8bcfdb04f62466b071de847/validators-0.35.0-py3-none-any.whl
@@ -34271,7 +34271,7 @@ packages:
   - scikit-learn ; extra == 'docs'
   - libsvm-official ; extra == 'docs'
   requires_python: '>=3.10'
-- pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=store-no-power-limit#0f0a02942121cedd6d94e3b294f783156e5bf989
+- pypi: git+https://github.com/sclfnc/pypsa2smspp.git?branch=sector-store-no-power-limit#a58799fa7e6e6acf026aef6a884bc585582de33e
   name: pypsa2smspp
   version: 0.0.5
   requires_dist:
