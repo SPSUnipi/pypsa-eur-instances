@@ -1,6 +1,7 @@
 """Heat aggregation must not turn unspecified dispatch into a zero setpoint."""
 
 import numpy as np
+import pandas as pd
 import pypsa
 import pytest
 
@@ -27,3 +28,20 @@ def test_clustered_heat_setpoints(values, expected):
             assert np.isnan(actual)
         else:
             assert actual == expected
+
+
+def test_clustered_heat_timeseries_preserve_unspecified_setpoints():
+    n = pypsa.Network()
+    n.set_snapshots(pd.date_range("2020-01-01", periods=3, freq="h"))
+    for sector, profile in [("residential", [np.nan, 0, 2]), ("services", [np.nan, np.nan, 3])]:
+        bus = f"node {sector} rural heat"
+        n.add("Bus", bus, carrier=f"{sector} rural heat")
+        n.add("Load", f"node {sector} rural demand", bus=bus,
+              carrier=f"{sector} rural demand", p_set=profile)
+
+    cluster_heat_buses(n)
+
+    np.testing.assert_allclose(
+        n.loads_t.p_set["node rural demand"].to_numpy(),
+        [np.nan, 0, 5], equal_nan=True,
+    )

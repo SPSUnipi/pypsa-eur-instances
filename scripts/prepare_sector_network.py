@@ -5706,7 +5706,7 @@ aggregate_dict = {
     "terrain_factor": "mean",
     "num_parallel": "sum",
     # An unspecified setpoint must stay NaN, otherwise clustering fixes dispatch to 0.
-    "p_set": lambda values: values.sum(min_count=1),
+    "p_set": lambda values, **kwargs: values.sum(min_count=1, **kwargs),
     "e_initial": "sum",
     "e_nom": pd.Series.sum,
     "e_nom_max": pd.Series.sum,
