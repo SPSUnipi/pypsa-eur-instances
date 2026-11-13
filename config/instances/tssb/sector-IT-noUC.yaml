@@ -2,7 +2,7 @@
 
 run:
   prefix: "capacity-expansion-tssb-sector-IT-noUC"
-  name: all
+  name: th_24c24_demand_20
   scenarios:
     enable: true
     file: config/instances/scenarios/tssb/scenarios-sector.yaml
@@ -14,6 +14,15 @@ run:
 
 foresight: overnight
 
+# Use a CO2 price instead of a hard emissions budget in this comparison.
+co2_budget: null
+
+costs:
+  emission_prices:
+    enable: true
+    dynamic: false
+    co2: 100.0  # EUR/tCO2; initial benchmark value
+
 scenario:
   clusters:
   - 5
@@ -24,7 +33,39 @@ scenario:
 countries:
 - IT
 
+electricity:
+  renewable_carriers:
+  - solar
+  - onwind
+  - offwind-ac
+  - offwind-dc
+  - offwind-float
+  extendable_carriers:
+    Generator:
+    - solar
+    - onwind
+    - offwind-ac
+    - offwind-dc
+    - offwind-float
+    - OCGT
+    - CCGT
+
+# Also exclude existing solar-hsat when importing the electricity network.
+pypsa_eur:
+  Generator:
+  - onwind
+  - offwind-ac
+  - offwind-dc
+  - offwind-float
+  - solar
+  - ror
+  - nuclear
+
 sector:
+  tes: false
+  # Avoid splitting bidirectional links into unsynchronised directional pairs.
+  transmission_efficiency:
+    enable: []
   land_transport_fuel_cell_share:
     2020: 0
     2025: 0
@@ -132,6 +173,12 @@ clustering:
     resolution_sector: 48c24
 
 solving:
+  solver_options:
+    smspp-tssb-bds:
+      # Disabled: the converter does not yet align merged links with dynamic data.
+      merge_links: false
+    smspp-tssb-ib-par:
+      merge_links: false
   options:
     load_shedding: 
       enable: true
@@ -140,5 +187,5 @@ solving:
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-tssb, smspp-tssb-bds]
+    name: [gurobi, smspp]
+    options: [gurobi-default, smspp-tssb-ib-par]

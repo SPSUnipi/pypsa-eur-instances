@@ -484,7 +484,6 @@ class SolvingConfig(BaseModel):
                 "configfile": "config/smspp/TSSBlock/TSSBSCfg-BDS.txt",
                 "pysmspp_options": {
                     "k": None,
-                    "v2": None,
                 },
                 "stochastic_parameters": {
                     "stochastic_type": "tssb",
@@ -496,7 +495,6 @@ class SolvingConfig(BaseModel):
                 "configfile": "config/smspp/TSSBlock/TSSBSCfg-BDS-CVX-pre.txt",
                 "pysmspp_options": {
                     "k": None,
-                    "v2": None,
                 },
                 "stochastic_parameters": {
                     "stochastic_type": "tssb",
@@ -595,11 +593,11 @@ class SolvingConfig(BaseModel):
                     "parameters": ["demand", "renewable_maxpower"],
                 },
             },
-            "smspp-tssb-ib-int": {
+            "smspp-tssb-ib-par": {
                 "capacity_expansion_ucblock": False,
-                "configfile": "config/smspp/TSSBlock/TSSBSCfg-IB-int.txt",
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-IB-par.txt",
                 "pysmspp_options": {
-                    "B": "InnerBCfg.txt",
+                    "B": "InnerBCfg-par.txt",
                 },
                 "stochastic_parameters": {
                     "stochastic_type": "tssb",

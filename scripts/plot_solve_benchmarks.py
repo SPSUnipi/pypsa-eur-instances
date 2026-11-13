@@ -38,18 +38,15 @@ REQUIRED_COLUMNS = {
     "objective_constant",
 }
 OUTCOME_STYLES = {
+    "failed": {"marker": "X", "label": "Failed", "size": 100},
     "infeasible": {"marker": "P", "label": "Infeasible", "size": 100},
     "time_limit": {"marker": "X", "label": "Time limit", "size": 130},
 }
 SOLVED_POINT_SIZE = 75
 SMSPP_TIMING_STYLES = {
     "smspp_computational_s": {
-        "label": "SMS++ computational",
+        "label": "SMS++ compute time",
         "linestyle": "--",
-    },
-    "smspp_optimization_s": {
-        "label": "SMS++ subprocess",
-        "linestyle": ":",
     },
 }
 
@@ -143,6 +140,11 @@ def prepare_data(path: Path) -> pd.DataFrame:
     data["modeled_hours"] = data["periods"] * data["hours_per_period"]
     data["clusters"] = pd.to_numeric(data["clusters"], errors="coerce")
     data["runtime_s"] = pd.to_numeric(data["s"], errors="coerce")
+    # Snakemake reports max_rss in MiB; display peak resident memory in GiB.
+    data["memory_gib"] = pd.to_numeric(
+        data.get("max_rss", pd.Series(index=data.index, dtype=float)),
+        errors="coerce",
+    ) / 1024
     for column in SMSPP_TIMING_STYLES:
         data[column] = pd.to_numeric(
             data.get(column, pd.Series(index=data.index, dtype=float)),
@@ -173,6 +175,12 @@ def prepare_data(path: Path) -> pd.DataFrame:
     time_limited = outcome_text.str.contains(
         r"time[_ -]?limit|stopped for time", case=False, regex=True
     )
+    failed = (
+        data.get("benchmark_file", pd.Series("", index=data.index))
+        .fillna("")
+        .str.endswith(".failed")
+    )
+    data.loc[failed, "outcome"] = "failed"
     data.loc[time_limited, "outcome"] = "time_limit"
     missing_limits = time_limited & data["time_limit_s"].isna()
     if missing_limits.any():
@@ -210,7 +218,7 @@ def prepare_data(path: Path) -> pd.DataFrame:
     ]
     return (
         data.groupby(group_columns, as_index=False, dropna=False)[
-            ["runtime_s", *SMSPP_TIMING_STYLES, "objective"]
+            ["runtime_s", *SMSPP_TIMING_STYLES, "objective", "memory_gib"]
         ]
         .median()
         .sort_values(["periods", "hours_per_period", "clusters", "solver_options"])
@@ -271,7 +279,7 @@ def draw_series(
         if subset.empty:
             continue
         # A time-limit point is an isolated observation, not part of a trend line.
-        connected_y = subset[y].where(subset["outcome"] != "time_limit")
+        connected_y = subset[y].where(~subset["outcome"].isin(["time_limit", "failed"]))
         ax.plot(
             subset[x],
             connected_y,
@@ -290,7 +298,7 @@ def draw_series(
                     timing_subset[timing_column],
                     color=colors[solver],
                     linestyle=timing_style["linestyle"],
-                    marker=None,
+                    marker="s",
                     linewidth=2,
                 )
         for outcome, outcome_subset in subset.groupby("outcome"):
@@ -321,7 +329,7 @@ def figure_legend(
     ]
     if any(data[column].notna().any() for column in SMSPP_TIMING_STYLES):
         handles.append(
-            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total")
+            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total time (benchmark)")
         )
         for column, style in SMSPP_TIMING_STYLES.items():
             if data[column].notna().any():
@@ -487,6 +495,24 @@ def plot_case(
             args.dpi,
         )
 
+    memory_data = data.loc[data["memory_gib"].notna() & (data["memory_gib"] > 0)].copy()
+    if memory_data.empty:
+        logger.warning("No positive max_rss values found; skipping memory plots.")
+    else:
+        # Timing lines are only relevant to the runtime figures.
+        memory_data[list(SMSPP_TIMING_STYLES)] = float("nan")
+        memory_solvers = sorted(memory_data["solver_options"].unique())
+        heading = f"Peak resident memory — {title_suffix}" if title_suffix else "Peak resident memory"
+        for dimension, make_figure in figures:
+            figure = make_figure(
+                memory_data, memory_solvers, colors, title, False,
+                y="memory_gib", y_label="Peak resident memory [GiB]", heading=heading,
+            )
+            save_figure(
+                figure, output_dir / f"benchmark_memory_{dimension}{stem_suffix}",
+                args.formats, args.dpi,
+            )
+
     valid_objective = data["objective"].notna() & (data["objective"] > 0)
     if not valid_objective.all():
         logger.warning(
@@ -495,6 +521,7 @@ def plot_case(
             f" for case variant {title_suffix}" if title_suffix else "",
         )
     objective_data = data.loc[valid_objective].copy()
+    objective_data[list(SMSPP_TIMING_STYLES)] = float("nan")
     if objective_data.empty:
         logger.warning("No numeric objective values found; skipping objective plots.")
         return
