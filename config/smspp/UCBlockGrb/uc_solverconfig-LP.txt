@@ -17,7 +17,7 @@ ComputeConfig  # Type of the object
 intLogVerb 1
 Method 2      # barrier: the default concurrent LP races the dual simplex
               # against it and leaves it a third of the cores
-Crossover 1   # a basis is not needed on the root relaxation
+Crossover 0   # a basis is not needed on the root relaxation
 PreDual 0     # solve the primal, never dualize
 AggFill 0     # no fill-in from presolve aggregation: it halves the nonzeros
               # of the barrier factorization

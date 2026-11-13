@@ -21,6 +21,37 @@ from plot_solve_benchmarks import (
 )
 
 
+def annotate_ratio(ax, data, metric, colors, mode):
+    """Annotate percentage changes, using only solved observations."""
+    solved = data.loc[data.outcome == "solved"]
+    pairs = []
+    if mode == "growth":
+        for solver, group in solved.groupby("solver_options"):
+            group = group.sort_values("scenarios")
+            if group.scenarios.nunique() > 1:
+                first, last = group.iloc[0], group.iloc[-1]
+                pairs.append((first.scenarios, first[metric], last.scenarios,
+                              last[metric], last[metric] / first[metric], colors[solver]))
+    else:
+        reference = solved.loc[solved.solver_options == "gurobi-default", ["scenarios", metric]]
+        for solver, group in solved.loc[solved.solver_options.str.startswith("smspp")].groupby("solver_options"):
+            matched = group.merge(reference, on="scenarios", suffixes=("", "_ref"))
+            if matched.empty:
+                continue
+            row = matched.loc[(matched[metric + "_ref"] - matched[metric]).abs().idxmax()]
+            pairs.append((row.scenarios, row[metric], row.scenarios,
+                          row[metric + "_ref"], row[metric + "_ref"] / row[metric], colors[solver]))
+    for x0, y0, x1, y1, ratio, color in pairs:
+        ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                    arrowprops=dict(arrowstyle="<->", linestyle="--", color="black",
+                                    linewidth=1.6, connectionstyle="arc3,rad=0.12"))
+        midpoint = math.sqrt(y0 * y1) if ax.get_yscale() == "log" else (y0 + y1) / 2
+        change = 100 * (ratio - 1) if mode == "growth" else 100 * (1 / ratio - 1)
+        ax.annotate(f"{change:+.1f}%", xy=((x0 + x1) / 2, midpoint),
+                    xytext=(12, 8), textcoords="offset points", color="black",
+                    fontweight="bold", bbox=dict(facecolor="white", edgecolor="none", alpha=0.85))
+
+
 def plot_relative_objective_error(data, output, nodes, periods, hours, variant, colors):
     """Compare total objectives against the matching PyPSA/Gurobi run."""
     reference = data.loc[
@@ -79,6 +110,7 @@ def main():
     parser.add_argument("input", type=Path)
     parser.add_argument("--nodes", type=int, default=5)
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--ratio-arrows", choices=["comparison", "growth"])
     args = parser.parse_args()
     data = prepare_data(args.input)
     data = data.loc[data.clusters == args.nodes].copy()
@@ -108,6 +140,8 @@ def main():
         fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
         draw_series(ax, subset, "scenarios", solvers, colors, metric)
         style_axis(ax, log_scale)
+        if args.ratio_arrows:
+            annotate_ratio(ax, subset, metric, colors, args.ratio_arrows)
         ax.set_xticks(sorted(data.scenarios.unique()))
         ax.set_xlabel("Number of scenarios")
         ax.set_ylabel(ylabel)

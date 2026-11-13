@@ -5,7 +5,7 @@ run:
   name: all
   scenarios:
     enable: true
-    file: config/instances/scenarios/tssb/scenarios-power.yaml
+    file: config/instances/scenarios/tssb/scenarios-power-limited.yaml
   disable_progressbar: true
   shared_resources:
     policy: false
@@ -50,5 +50,5 @@ solving:
   solver:
     # name: [gurobi, smspp, smspp, smspp]
     # options: [gurobi-default, smspp-tssb, smspp-tssb-bds, smspp-tssb-ib-par]
-    name: [gurobi, smspp]
-    options: [gurobi-default, smspp-tssb-ib-par]
+    name: [gurobi, smspp, smspp]
+    options: [gurobi-default, smspp-tssb-ib-par, smspp-tssb-bds]
