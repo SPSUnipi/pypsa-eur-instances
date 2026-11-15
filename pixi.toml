@@ -69,7 +69,7 @@ linopy = "==0.7.0"
 lxml = ">=6.0.2"
 matplotlib = ">=3.10.7"
 memory_profiler = ">=0.61.0"
-netcdf4 = ">=1.7.2,!=1.7.4"
+netcdf4 = ">=1.7.5"
 networkx = ">=3.5"
 numpy = ">=1.26.4"
 openpyxl = ">=3.1.5"
@@ -181,5 +181,5 @@ test = ["test"]
 
 [pypi-dependencies]
 pypsa = { git = "https://github.com/AlessandroPampado99/PyPSA.git", branch = "smspp_optimize", extras = ["smspp"] }
-pypsa2smspp = ">=0.0.5"
-pysmspp = ">=0.0.11"
+pypsa2smspp = { git = "https://github.com/SPSUnipi/pypsa2smspp.git", rev = "5ffeb6251e36df5ec011e50c0efb21f438ebc0cd" }
+pysmspp = { git = "https://github.com/SPSUnipi/pySMSpp.git", rev = "bb4f460a61d07982815f0f6c6c9ec1c624be7187" }
