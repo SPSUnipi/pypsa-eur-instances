@@ -1,0 +1,18 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - InnerBCfg-MIP.txt - - - - - - - - - - - - - - -
+#
+# The map of InnerBCfg.txt giving the InvestmentBlock IBOCfg-MIP.txt, for
+# the unit commitment dispatch, whose inner UCBlock is solved as a MIP.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+SimpleConfiguration<std::map<std::string,Configuration*>>
+
+1  # the number of elements in the map
+
+InvestmentBlock         *IBOCfg-MIP.txt
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - END InnerBCfg-MIP.txt - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
