@@ -248,7 +248,48 @@ def needs_log_scale(values: pd.Series, ratio_threshold: float = 20.0) -> bool:
 
 def solver_colors(solvers: list[str]) -> dict[str, object]:
     palette = plt.get_cmap("tab10")
-    return {solver: palette(index % 10) for index, solver in enumerate(solvers)}
+    fixed = {
+        "gurobi-default": "#1f77b4",
+        "smspp-tssb-ib-par": "#ff7f0e",
+        "smspp-tssb-bds": "#b8860b",
+        "gurobi-16": "#6baed6",
+        "gurobi-32": "#2171b5",
+        "gurobi-64": "#08306b",
+        "smspp-tssb-ib-16": "#fdae6b",
+        "smspp-tssb-ib-32": "#f16913",
+        "smspp-tssb-ib-64": "#a63603",
+    }
+    return {solver: fixed.get(solver, palette(index % 10)) for index, solver in enumerate(solvers)}
+
+
+def solver_label(solver: str) -> str:
+    match = re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver)
+    if match:
+        family, threads = match.groups()
+        return f"{'PyPSA-gurobi' if family == 'gurobi' else 'SMS++-TSSB-IB'}-{threads}"
+    return {
+        "gurobi-default": "PyPSA-gurobi",
+        "smspp-tssb-ib-par": "SMS++-TSSB-IB",
+        "smspp-tssb-bds": "SMS++-TSSB-BDS",
+    }.get(solver, solver)
+
+
+def configure_plot_style() -> None:
+    """Share readable typography across benchmark plotting commands."""
+    plt.rcParams.update({
+        "font.family": "sans-serif",
+        "font.size": 15,
+        "axes.titlesize": 17,
+        "axes.labelsize": 15,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "legend.fontsize": 15,
+        "legend.title_fontsize": 15,
+        "figure.titlesize": 20,
+        "figure.facecolor": "white",
+        "axes.facecolor": "white",
+        "savefig.facecolor": "white",
+    })
 
 
 def style_axis(ax: plt.Axes, log_scale: bool) -> None:
@@ -286,7 +327,7 @@ def draw_series(
             color=colors[solver],
             marker=None,
             linewidth=2,
-            label=solver,
+            label=solver_label(solver),
         )
         if y == "runtime_s":
             for timing_column, timing_style in SMSPP_TIMING_STYLES.items():
@@ -315,6 +356,49 @@ def draw_series(
                 linewidth=1.1,
                 zorder=4,
             )
+        if y == "runtime_s":
+            for x_value, runtime in subset[[x, y]].dropna().itertuples(index=False, name=None):
+                if re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver):
+                    continue
+                if x == "scenarios" and x_value not in (10, 100, 200):
+                    continue
+                offset = {
+                    "gurobi-default": (0, 15),
+                    "smspp-tssb-ib-par": (0, -27),
+                    "smspp-tssb-bds": (0, 15),
+                }.get(solver, (0, 15))
+                thread_match = re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver)
+                if thread_match:
+                    family, threads = thread_match.groups()
+                    peers = data.loc[
+                        (data[x] == x_value)
+                        & data["solver_options"].str.fullmatch(f"{family}-(16|32|64)")
+                    ].sort_values(y, ascending=family == "gurobi")
+                    rank = peers["solver_options"].tolist().index(solver)
+                    offset = (0, 15 + 23 * rank if family == "gurobi" else -27 - 23 * rank)
+                if x == "scenarios" and x_value >= 100:
+                    if solver == "gurobi-default":
+                        offset = (0, 15)
+                    elif solver == "smspp-tssb-bds":
+                        offset = (0, -27)
+                if runtime >= 3600:
+                    runtime_label = f"{runtime / 3600:.2f} h"
+                elif runtime >= 60:
+                    runtime_label = f"{runtime / 60:.1f} min"
+                else:
+                    runtime_label = f"{runtime:.1f} s"
+                ax.annotate(
+                    runtime_label,
+                    xy=(x_value, runtime),
+                    xytext=offset,
+                    textcoords="offset points",
+                    ha="center",
+                    color=colors[solver],
+                    fontsize=14,
+                    bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1),
+                    annotation_clip=False,
+                )
+            ax.margins(y=0.45 if any(re.fullmatch(r"gurobi-(16|32|64)", s) for s in solvers) else 0.25)
 
 
 def figure_legend(
@@ -324,7 +408,7 @@ def figure_legend(
     colors: dict[str, object],
 ) -> None:
     handles = [
-        Line2D([], [], color=colors[s], marker="o", linewidth=2, label=s)
+        Line2D([], [], color=colors[s], marker="o", linewidth=2, label=solver_label(s))
         for s in solvers
     ]
     if any(data[column].notna().any() for column in SMSPP_TIMING_STYLES):
@@ -359,7 +443,7 @@ def figure_legend(
     figure.legend(
         handles=handles,
         loc="outside lower center",
-        ncols=min(len(handles), 4),
+        ncols=min(len(handles), 3),
         frameon=False,
         title="Solver options / timing / outcome",
     )
@@ -408,7 +492,7 @@ def make_node_scaling_figure(
         ax.set_ylabel(y_label)
     for ax in axes.flat[len(resolutions) :]:
         ax.set_visible(False)
-    figure.suptitle(f"{heading or title}\nNetwork size", fontweight="bold", fontsize=15)
+    figure.suptitle(f"{heading or title}\nNetwork size", fontweight="bold")
     figure_legend(figure, data, solvers, colors)
     return figure
 
@@ -456,7 +540,7 @@ def make_time_scaling_figure(
         ax.set_ylabel(y_label)
     for ax in axes.flat[len(clusters) :]:
         ax.set_visible(False)
-    figure.suptitle(f"{heading or title}\nModeled time", fontweight="bold", fontsize=15)
+    figure.suptitle(f"{heading or title}\nModeled time", fontweight="bold")
     figure_legend(figure, data, solvers, colors)
     return figure
 
@@ -553,18 +637,7 @@ def main() -> None:
     output_dir = args.output_dir or args.input.parent / "plots"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    plt.rcParams.update(
-        {
-            "font.family": "sans-serif",
-            "font.size": 10,
-            "axes.titlesize": 11,
-            "axes.labelsize": 10,
-            "legend.fontsize": 9,
-            "figure.facecolor": "white",
-            "axes.facecolor": "white",
-            "savefig.facecolor": "white",
-        }
-    )
+    configure_plot_style()
     data = prepare_data(args.input)
     all_solvers = sorted(data["solver_options"].unique())
     colors = solver_colors(all_solvers)

@@ -12,11 +12,13 @@ from matplotlib.ticker import LogFormatterSciNotation
 
 from plot_solve_benchmarks import (
     SMSPP_TIMING_STYLES,
+    configure_plot_style,
     draw_series,
     figure_legend,
     prepare_data,
     save_figure,
     solver_colors,
+    solver_label,
     style_axis,
 )
 
@@ -54,8 +56,9 @@ def annotate_ratio(ax, data, metric, colors, mode):
 
 def plot_relative_objective_error(data, output, nodes, periods, hours, variant, colors):
     """Compare total objectives against the matching PyPSA/Gurobi run."""
+    reference_solver = "gurobi-default" if "gurobi-default" in data.solver_options.values else "gurobi-32"
     reference = data.loc[
-        (data.solver_options == "gurobi-default") & (data.outcome == "solved"),
+        (data.solver_options == reference_solver) & (data.outcome == "solved"),
         ["scenarios", "objective"],
     ].rename(columns={"objective": "pypsa_objective"})
     errors = data.loc[data.solver_options.str.startswith("smspp")].merge(
@@ -73,14 +76,14 @@ def plot_relative_objective_error(data, output, nodes, periods, hours, variant, 
     if valid.empty:
         return
     for signed in (False, True):
-        fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
         for solver, subset in valid.groupby("solver_options"):
             subset = subset.sort_values("scenarios")
             values = subset.relative_error
             if not signed:
                 values = values.abs().where(values != 0)
             ax.plot(subset.scenarios, values, marker="o", linewidth=2,
-                    color=colors[solver], label=solver)
+                    color=colors[solver], label=solver_label(solver))
         style_axis(ax, False)
         if signed:
             # Keep the sign; only a small neighbourhood of zero is linear.
@@ -90,6 +93,14 @@ def plot_relative_objective_error(data, output, nodes, periods, hours, variant, 
                 if not nonzero.empty else 1e-8
             )
             ax.set_yscale("symlog", linthresh=threshold)
+            tolerance = 1e-5
+            for bound in (-tolerance, tolerance):
+                ax.axhline(
+                    bound, color="#777777", linestyle="--", linewidth=1,
+                    label="Reference bounds ±1e−5" if bound > 0 else None,
+                )
+            lower, upper = ax.get_ylim()
+            ax.set_ylim(min(lower, -1.5 * tolerance), max(upper, 1.5 * tolerance))
             ax.axhline(0, color="#777777", linewidth=0.8)
             ax.set_ylabel("Relative objective error (SMS++ − PyPSA) / PyPSA")
             ax.set_title(f"Signed error · symlog (linear within ±{threshold:g})", loc="left")
@@ -100,7 +111,8 @@ def plot_relative_objective_error(data, output, nodes, periods, hours, variant, 
         ax.yaxis.set_major_formatter(LogFormatterSciNotation())
         ax.set_xticks(sorted(data.scenarios.unique()))
         ax.set_xlabel("Number of scenarios")
-        fig.suptitle(f"{nodes} nodes · {int(periods)} × {int(hours)} h · {variant}", fontweight="bold")
+        reference_note = " · reference: PyPSA-gurobi-32" if reference_solver == "gurobi-32" else ""
+        fig.suptitle(f"{nodes} nodes · {int(periods)} × {int(hours)} h · {variant}{reference_note}", fontweight="bold")
         ax.legend(frameon=False)
         save_figure(fig, output / (stem + ("_signed" if signed else "")), ["png", "pdf"], 220)
 
@@ -111,7 +123,9 @@ def main():
     parser.add_argument("--nodes", type=int, default=5)
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--ratio-arrows", choices=["comparison", "growth"])
+    parser.add_argument("--ratio-solver", help="Restrict comparison arrows to this solver option set.")
     args = parser.parse_args()
+    configure_plot_style()
     data = prepare_data(args.input)
     data = data.loc[data.clusters == args.nodes].copy()
     if data.empty:
@@ -137,11 +151,33 @@ def main():
             raise ValueError(f"No positive observations for {metric}")
         if metric == "memory_gib":
             subset[list(SMSPP_TIMING_STYLES)] = float("nan")
-        fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
         draw_series(ax, subset, "scenarios", solvers, colors, metric)
         style_axis(ax, log_scale)
-        if args.ratio_arrows:
-            annotate_ratio(ax, subset, metric, colors, args.ratio_arrows)
+        if metric == "runtime_s":
+            for family in ("gurobi", "smspp-tssb-ib"):
+                family_data = subset.loc[subset.solver_options.isin([f"{family}-16", f"{family}-64"])]
+                for scenarios, points in family_data.groupby("scenarios"):
+                    if scenarios not in (10, 100, 200):
+                        continue
+                    low, high = points.runtime_s.min(), points.runtime_s.max()
+                    divisor, unit = (3600, "h") if low >= 3600 else ((60, "min") if low >= 60 else (1, "s"))
+                    text = f"{low / divisor:.1f}–{high / divisor:.1f} {unit}"
+                    above = family == "gurobi"
+                    anchor = high if above else low
+                    ax.annotate(
+                        text, xy=(scenarios, anchor),
+                        xytext=(0, 15 if above else -27),
+                        textcoords="offset points", ha="center", fontsize=14,
+                        color=colors[f"{family}-64"],
+                        bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=1),
+                        annotation_clip=False,
+                    )
+        if args.ratio_arrows and metric == "runtime_s":
+            ratio_data = subset
+            if args.ratio_solver:
+                ratio_data = subset.loc[subset.solver_options.isin(["gurobi-default", args.ratio_solver])]
+            annotate_ratio(ax, ratio_data, metric, colors, args.ratio_arrows)
         ax.set_xticks(sorted(data.scenarios.unique()))
         ax.set_xlabel("Number of scenarios")
         ax.set_ylabel(ylabel)
