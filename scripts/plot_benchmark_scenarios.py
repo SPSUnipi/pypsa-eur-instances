@@ -76,7 +76,7 @@ def plot_relative_objective_error(data, output, nodes, periods, hours, variant, 
     if valid.empty:
         return
     for signed in (False, True):
-        fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(10, 3.5 if signed else 7), constrained_layout=True)
         for solver, subset in valid.groupby("solver_options"):
             subset = subset.sort_values("scenarios")
             values = subset.relative_error
@@ -102,8 +102,7 @@ def plot_relative_objective_error(data, output, nodes, periods, hours, variant, 
             lower, upper = ax.get_ylim()
             ax.set_ylim(min(lower, -1.5 * tolerance), max(upper, 1.5 * tolerance))
             ax.axhline(0, color="#777777", linewidth=0.8)
-            ax.set_ylabel("Relative objective error (SMS++ − PyPSA) / PyPSA")
-            ax.set_title(f"Signed error · symlog (linear within ±{threshold:g})", loc="left")
+            ax.set_ylabel("Relative error")
         else:
             ax.set_yscale("log")
             ax.set_ylabel("Absolute relative objective error |(SMS++ − PyPSA) / PyPSA|")
@@ -112,9 +111,16 @@ def plot_relative_objective_error(data, output, nodes, periods, hours, variant, 
         ax.set_xticks(sorted(data.scenarios.unique()))
         ax.set_xlabel("Number of scenarios")
         reference_note = " · reference: PyPSA-gurobi-32" if reference_solver == "gurobi-32" else ""
-        fig.suptitle(f"{nodes} nodes · {int(periods)} × {int(hours)} h · {variant}{reference_note}", fontweight="bold")
-        ax.legend(frameon=False)
-        save_figure(fig, output / (stem + ("_signed" if signed else "")), ["png", "pdf"], 220)
+        fig.suptitle(
+            "Objective error" if signed else f"{nodes} nodes · {int(periods)} × {int(hours)} h · {variant}{reference_note}",
+            fontweight="bold",
+        )
+        if signed:
+            handles, labels = ax.get_legend_handles_labels()
+            fig.legend(handles, labels, loc="outside lower center", ncols=2, frameon=False, fontsize=14)
+        else:
+            ax.legend(frameon=False)
+        save_figure(fig, output / (stem + ("_signed" if signed else "")), ["png", "pdf"], 400)
 
 
 def main():
@@ -124,8 +130,17 @@ def main():
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--ratio-arrows", choices=["comparison", "growth"])
     parser.add_argument("--ratio-solver", help="Restrict comparison arrows to this solver option set.")
+    parser.add_argument("--total-time-only", action="store_true", help="Hide compute-time curves and legend entries.")
+    parser.add_argument("--dpi", type=int, default=400)
     args = parser.parse_args()
     configure_plot_style()
+    if args.total_time_only:
+        for setting in (
+            "font.size", "axes.titlesize", "axes.labelsize",
+            "xtick.labelsize", "ytick.labelsize", "figure.titlesize",
+        ):
+            plt.rcParams[setting] += 2
+        plt.rcParams["legend.fontsize"] -= 1
     data = prepare_data(args.input)
     data = data.loc[data.clusters == args.nodes].copy()
     if data.empty:
@@ -149,10 +164,13 @@ def main():
         subset = data.loc[data[metric].notna() & (data[metric] > 0)].copy()
         if subset.empty:
             raise ValueError(f"No positive observations for {metric}")
-        if metric == "memory_gib":
+        if metric == "memory_gib" or args.total_time_only:
             subset[list(SMSPP_TIMING_STYLES)] = float("nan")
-        fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(10, 5.2 if args.total_time_only else 7), constrained_layout=True)
         draw_series(ax, subset, "scenarios", solvers, colors, metric)
+        if args.total_time_only:
+            for annotation in ax.texts:
+                annotation.set_fontsize(annotation.get_fontsize() + 2)
         style_axis(ax, log_scale)
         if metric == "runtime_s":
             for family in ("gurobi", "smspp-tssb-ib"):
@@ -185,9 +203,9 @@ def main():
             f"{args.nodes} nodes · {int(periods)} × {int(hours)} h · {variant}",
             loc="left",
         )
-        fig.suptitle("Solver computational performance", fontweight="bold")
-        figure_legend(fig, subset, solvers, colors)
-        save_figure(fig, output / f"{stem}_{args.nodes}_nodes", ["png", "pdf"], 220)
+        fig.suptitle("Computational time" if metric == "runtime_s" else "Peak memory", fontweight="bold")
+        figure_legend(fig, subset, solvers, colors, ncols=2 if args.total_time_only else 3)
+        save_figure(fig, output / f"{stem}_{args.nodes}_nodes", ["png", "pdf"], args.dpi)
     print(data[["scenarios", "solver_options", "runtime_s", "memory_gib", "outcome"]].to_string(index=False))
 
 

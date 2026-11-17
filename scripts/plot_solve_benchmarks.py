@@ -250,8 +250,8 @@ def solver_colors(solvers: list[str]) -> dict[str, object]:
     palette = plt.get_cmap("tab10")
     fixed = {
         "gurobi-default": "#1f77b4",
-        "smspp-tssb-ib-par": "#ff7f0e",
-        "smspp-tssb-bds": "#b8860b",
+        "smspp-tssb-ib-par": "#9467bd",
+        "smspp-tssb-bds": "#ff7f0e",
         "gurobi-16": "#6baed6",
         "gurobi-32": "#2171b5",
         "gurobi-64": "#08306b",
@@ -268,9 +268,9 @@ def solver_label(solver: str) -> str:
         family, threads = match.groups()
         return f"{'PyPSA-gurobi' if family == 'gurobi' else 'SMS++-TSSB-IB'}-{threads}"
     return {
-        "gurobi-default": "PyPSA-gurobi",
-        "smspp-tssb-ib-par": "SMS++-TSSB-IB",
-        "smspp-tssb-bds": "SMS++-TSSB-BDS",
+        "gurobi-default": "PyPSA + Gurobi",
+        "smspp-tssb-ib-par": "SMS++ InvestmentBlock + Gurobi",
+        "smspp-tssb-bds": "SMS++ Benders + Gurobi",
     }.get(solver, solver)
 
 
@@ -406,6 +406,7 @@ def figure_legend(
     data: pd.DataFrame,
     solvers: list[str],
     colors: dict[str, object],
+    ncols: int = 3,
 ) -> None:
     handles = [
         Line2D([], [], color=colors[s], marker="o", linewidth=2, label=solver_label(s))
@@ -443,9 +444,9 @@ def figure_legend(
     figure.legend(
         handles=handles,
         loc="outside lower center",
-        ncols=min(len(handles), 3),
+        ncols=min(len(handles), ncols),
         frameon=False,
-        title="Solver options / timing / outcome",
+        title=None,
     )
 
 
