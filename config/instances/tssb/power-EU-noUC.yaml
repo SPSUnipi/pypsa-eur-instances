@@ -16,19 +16,54 @@ foresight: overnight
 
 scenario:
   clusters:
-  - 50
-  - 100
-  - 200
-  - 1000
+  - 5
+  - 20
+
   opts:
   - ''
+
+countries:
+- AL
+- AT
+- BA
+- BE
+- BG
+- CH
+- CZ
+- DE
+- DK
+- EE
+- ES
+- FI
+- FR
+- GB
+- GR
+- HR
+- HU
+- IE
+- IT
+- LT
+- LU
+- LV
+- ME
+- MK
+- NL
+- 'NO'
+- PL
+- PT
+- RO
+- RS
+- SE
+- SI
+- SK
+- XK
 
 stochastic_scenarios:
   enable: true
   file: config/instances/scenarios/tssb/stochastic-demand_3.yaml
   export:
-    average: false
-    scenarios: false
+    average: true
+    scenarios: true
   postprocess:
     use_average: false
     scenarios: false
@@ -39,12 +74,14 @@ clustering:
 
 solving:
   options:
-    load_shedding:
+    load_shedding: 
       enable: true
     skip_iterations: true
     transmission_losses: 0
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-tssb, smspp-tssb-bds]
+    # name: [gurobi, smspp, smspp, smspp]
+    # options: [gurobi-default, smspp-tssb, smspp-tssb-bds, smspp-tssb-ib-par]
+    name: [gurobi, smspp]
+    options: [gurobi-default, smspp-tssb-ib-par]

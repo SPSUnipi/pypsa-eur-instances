@@ -19,6 +19,7 @@ scenario:
   - 5
   - 20
   - 50
+  
   opts:
   - ''
 
@@ -38,5 +39,5 @@ solving:
     linearized_unit_commitment: false
     noisy_costs: false
   solver:
-    name: [gurobi, smspp, smspp]
-    options: [gurobi-default, smspp-ucblock, smspp-investmentblock]
+    name: [gurobi, smspp]
+    options: [gurobi-default, smspp-ucblock]
