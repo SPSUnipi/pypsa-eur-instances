@@ -98,6 +98,7 @@ shapely = ">=2.0"
 snakemake-executor-plugin-cluster-generic = ">=1.0.9"
 snakemake-minimal = ">=9"
 snakemake-storage-plugin-http = ">=0.3"
+sqlite = ">=3.37"  # older builds carry a libsqlite3 that libgdal cannot load
 tenacity = ">=9.1.2"
 tqdm = ">=4.67.1"
 tsam = ">=2.3.1"
