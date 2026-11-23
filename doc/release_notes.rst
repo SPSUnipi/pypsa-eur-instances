@@ -11,6 +11,8 @@ Release Notes
 
 * SMS++ configurations: the Benders decomposition (``BDSCfg.txt``) and the bundle of the InvestmentBlock (``IBBundleCfg.txt``) stop at the relative gap of 1e-5, the ``BarConvTol`` of the ``gurobi-default`` solver options of PyPSA, so that every method of the comparison stops at the same accuracy (they stopped at 1e-6). The Benders decomposition evaluates the subproblems of a round with 32 threads, as many as the monolithic run, and with the presolve on (``BDSSCfg-pre.txt``), since no subproblem is infeasible.
 
+* SMS++ configurations: the subproblems of the Benders decomposition (``BDSSMILPCfg.txt``) free the memory of Gurobi after each solve (``intFreeWorkspace 1``), which SMS++ no longer does by default; this needs the release of SMS++ after 0.8.0.
+
 * Fix: SMS++ configurations: the subproblems of the Benders decomposition (``BDSSMILPCfg.txt``) give the multipliers of the columns of a Farkas certificate without the costs (``intHomogeneousDirection 1``), without which a feasibility cut could cut away the optimum.
 
 * Fix: ``build_swiss_energy_balances`` reads the October 2026 edition of the Swiss energy balances (data for 2000-2025), which renamed some table rows, as in PyPSA-Eur (https://github.com/PyPSA/pypsa-eur/pull/2380).

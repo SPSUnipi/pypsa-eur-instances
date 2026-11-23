@@ -12,7 +12,7 @@ ComputeConfig # exact type of the ComputeConfig object
 0  # f_diff == 0 ==> all non-provided parameters are set to the default value
    # f_diff == 1 ==> all non-provided parameters are not changed
 
-7  # number of integer parameters
+8  # number of integer parameters
 
 # now all the integer parameters
 intLogVerb        0  # LogVerb, log verbosity of the MILPSolver
@@ -30,6 +30,8 @@ intThrowReducedCostException  0  # a Variable whose bounds are those of its
 intHomogeneousDirection 1  # the multipliers of the columns of a Farkas
                      # certificate are - A' y, without the costs, or the
                      # feasibility cut is wrong
+intFreeWorkspace  1  # the memory of Gurobi freed after each solve, which
+                     # keeps that of the subproblems of many scenarios low
 
 1  # number of double parameters
 
