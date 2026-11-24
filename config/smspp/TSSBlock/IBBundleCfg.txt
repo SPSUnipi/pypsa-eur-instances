@@ -43,7 +43,8 @@ intRstAlg  2      # parameter to handle the reset of the algorithm
 16 # number of double parameters
 
 # now all the double parameters
-dblRelAcc  1e-6   # relative accuracy required to solution
+dblRelAcc  1e-5   # relative accuracy required to solution, the
+                  # BarConvTol of the monolithic run of TSSBCfg_grb.txt
 dblMaxTime 43200  # seconds for the whole call
 dblNZEps   1e-9   # stopping parameter: threshold to declare 0 the
                   # || residual ||,
