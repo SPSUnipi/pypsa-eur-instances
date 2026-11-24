@@ -25,7 +25,7 @@ costs:
 
 scenario:
   clusters:
-  - 5
+  - 20
 
   opts:
   - ''

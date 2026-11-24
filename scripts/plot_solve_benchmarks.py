@@ -255,9 +255,9 @@ def solver_colors(solvers: list[str]) -> dict[str, object]:
         "gurobi-16": "#6baed6",
         "gurobi-32": "#2171b5",
         "gurobi-64": "#08306b",
-        "smspp-tssb-ib-16": "#fdae6b",
-        "smspp-tssb-ib-32": "#f16913",
-        "smspp-tssb-ib-64": "#a63603",
+        "smspp-tssb-ib-16": "#bcbddc",
+        "smspp-tssb-ib-32": "#9467bd",
+        "smspp-tssb-ib-64": "#54278f",
     }
     return {solver: fixed.get(solver, palette(index % 10)) for index, solver in enumerate(solvers)}
 
@@ -266,7 +266,8 @@ def solver_label(solver: str) -> str:
     match = re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver)
     if match:
         family, threads = match.groups()
-        return f"{'PyPSA-gurobi' if family == 'gurobi' else 'SMS++-TSSB-IB'}-{threads}"
+        label = "PyPSA + Gurobi" if family == "gurobi" else "SMS++ InvestmentBlock\n+ Gurobi"
+        return f"{label}-{threads}"
     return {
         "gurobi-default": "PyPSA + Gurobi",
         "smspp-tssb-ib-par": "SMS++ InvestmentBlock + Gurobi",

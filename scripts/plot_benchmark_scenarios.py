@@ -204,7 +204,8 @@ def main():
             loc="left",
         )
         fig.suptitle("Computational time" if metric == "runtime_s" else "Peak memory", fontweight="bold")
-        figure_legend(fig, subset, solvers, colors, ncols=2 if args.total_time_only else 3)
+        legend_columns = 3 if len(solvers) > 3 else 2
+        figure_legend(fig, subset, solvers, colors, ncols=legend_columns if args.total_time_only else 3)
         save_figure(fig, output / f"{stem}_{args.nodes}_nodes", ["png", "pdf"], args.dpi)
     print(data[["scenarios", "solver_options", "runtime_s", "memory_gib", "outcome"]].to_string(index=False))
 

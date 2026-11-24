@@ -63,7 +63,7 @@ def main():
     draw_series(memory_ax, data, "scenarios", solvers, colors, "memory_gib")
     style_axis(memory_ax, False)
     memory_ax.set_ylabel("Peak resident memory [GiB]")
-    memory_ax.set_title("Memory", loc="left", fontweight="semibold")
+    memory_ax.set_title("Peak memory", loc="left", fontweight="semibold")
     for solver, subset in errors.groupby("solver_options"):
         subset = subset.sort_values("scenarios")
         error_ax.plot(subset.scenarios, subset.relative_error,
@@ -78,7 +78,7 @@ def main():
     error_ax.axhline(0, color="#777777", linewidth=0.8)
     lower, upper = error_ax.get_ylim()
     error_ax.set_ylim(min(lower, -1.5e-5), max(upper, 1.5e-5))
-    error_ax.set_title("Relative objective error", loc="left", fontweight="semibold")
+    error_ax.set_title("Objective error", loc="left", fontweight="semibold")
     error_ax.set_ylabel("(SMS++ − PyPSA) / PyPSA")
     for ax in (memory_ax, error_ax):
         ax.set_xticks(sorted(data.scenarios.unique()))
@@ -96,7 +96,7 @@ def main():
     output = args.output_dir or args.input.parent
     output.mkdir(parents=True, exist_ok=True)
     save_figure(fig, output / f"benchmark_memory_and_relative_objective_error_{args.nodes}_nodes",
-                ["png", "pdf"], 220)
+                ["png", "pdf"], 400)
 
 
 if __name__ == "__main__":
