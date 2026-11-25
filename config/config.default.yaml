@@ -1299,7 +1299,7 @@ solving:
       enable_thermal_units: true
       configfile: config/smspp/InvestmentBlockGrb/BSPar.txt
       pysmspp_options:
-        B: InnerBCfg-MIP.txt
+        B: "InnerBCfg-MIP.txt"
     "smspp-unitcommitment-capacity-expansion":
       capacity_expansion_ucblock: false
       enable_thermal_units: true
