@@ -1,13 +1,14 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - - BSCfg_grb.txt - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - BSCfg.txt - - - - - - - - - - - - - - - - -
 #
-# Gurobi variant of BSCfg.txt: a BlockSolverConfig for the inner UCBlock-style
-# block of an InvestmentBlock, to be solved by GRBMILPSolver as the LP
-# relaxation (intRelaxIntVars 1) of the underlying MIP, with the presolve and
-# the numerical focus of Gurobi left at their default: the inner LP is solved
-# at every evaluation of the InvestmentFunction, and with Presolve 0 and
+# A BlockSolverConfig for the inner UCBlock-style block of an
+# InvestmentBlock, to be solved by GRBMILPSolver as the LP relaxation of the
+# underlying MIP [see MILPCfg.txt], with the presolve and the numerical
+# focus of Gurobi left at their default: the inner LP is solved at every
+# evaluation of the InvestmentFunction, and with Presolve 0 and
 # NumericFocus 3 each evaluation cost 2.5 times as much, which the badly
-# scaled LPs that make HiGHS fail (see BSCfg.txt) do not need with Gurobi.
+# scaled LPs that make HiGHS fail (see InvestmentBlockHiGHS/BSCfg.txt) do
+# not need with Gurobi.
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # BlockSolverConfig - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,54 +27,11 @@ GRBMILPSolver     # name of Solver
 # now all the ComputeConfig
 # 1st ComputeConfig - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-ComputeConfig # exact type of the ComputeConfig object
+*MILPCfg.txt
 
-1  # f_diff == 0 ==> all non-provided parameters are set to the default value
-   # f_diff == 1 ==> all non-provided parameters are not changed
-
-3  # number of integer parameters
-
-# now all the integer parameters
-intLogVerb          0    # LogVerb, log verbosity of the MILPSolver
-intRelaxIntVars     1    # nonzero if the continuous relaxation is solved
-intCutSepPar        7    # separate user cuts + lazy constraints
-
-# All specific GUROBI parameter
-
-0  # number of double parameters
-
-# now all the double parameters
-# [none]
-
-0 # number of string parameters
-
-# now all the string parameters
-# [none]
-
-#strOutputFile uc_lp.lp
-
-0 # number of vector-of-int parameters
-
-# now all the vector-of-int parameters
-# [none]
-
-0 # number of vector-of-double parameters
-
-# now all the vector-of-double parameters
-# [none]
-
-0 # number of vector-of-string parameters
-
-# now all the vector-of-string parameters
-# [none]
-
-# pointer to the "extra" Configuration
-* # [none]
-
-# end of 1st ComputeConfig- - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# end of BlockSolverConfig- - - - - - - - - - - - - - - - - - - - - - - - - -
+# end of 1st ComputeConfig - - - - - - - - - - - - - - - - - - - - - - - - -
+# end of BlockSolverConfig - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - - - - - - - - - - - - - END BSCfg_grb.txt - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - END BSCfg.txt - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
