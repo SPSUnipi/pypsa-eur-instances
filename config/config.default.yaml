@@ -1311,14 +1311,14 @@ solving:
     "glpk-default": {}
     "smspp-ucblock":
       capacity_expansion_ucblock: true
-      configfile: config/smspp/UCBlockGrb/uc_solverconfig-LP.txt
+      configfile: "config/smspp/UCBlockGrb/uc_solverconfig-LP.txt"
     "smspp-investmentblock":
       capacity_expansion_ucblock: false
       configfile: config/smspp/InvestmentBlockGrb/BSPar.txt
     "smspp-unitcommitment-dispatch-ucblock":
       capacity_expansion_ucblock: true
       enable_thermal_units: true
-      configfile: config/smspp/UCBlockGrb/uc_solverconfig-MILP.txt
+      configfile: "config/smspp/UCBlockGrb/uc_solverconfig-MILP.txt"
     "smspp-unitcommitment-dispatch-investmentblock":
       capacity_expansion_ucblock: false
       enable_thermal_units: true
@@ -1359,7 +1359,7 @@ solving:
       configfile: "config/smspp/TSSBlock/TSSBSCfg-BDS.txt"
       pysmspp_options:
         k:
-        v2:  # -v2: the log of the BendersDecompositionSolver, a line per round
+        v2:
       stochastic_parameters:
         stochastic_type: tssb
         parameters:
@@ -1370,7 +1370,7 @@ solving:
       configfile: "config/smspp/TSSBlock/TSSBSCfg-BDS-CVX-pre.txt"
       pysmspp_options:
         k:
-        v2:  # -v2: the log of the BendersDecompositionSolver, a line per round
+        v2:
       stochastic_parameters:
         stochastic_type: tssb
         parameters:
@@ -1476,7 +1476,7 @@ solving:
       capacity_expansion_ucblock: false
       configfile: "config/smspp/TSSBlock/TSSBSCfg-IB-par.txt"
       pysmspp_options:
-        B: InnerBCfg-par.txt
+        B: "InnerBCfg-par.txt"
       stochastic_parameters:
         stochastic_type: tssb
         investment_outside: true
@@ -1487,7 +1487,7 @@ solving:
       capacity_expansion_ucblock: false
       configfile: "config/smspp/TSSBlock/TSSBSCfg-IB-par-16.txt"
       pysmspp_options:
-        B: InnerBCfg-par.txt
+        B: "InnerBCfg-par.txt"
       stochastic_parameters:
         stochastic_type: tssb
         investment_outside: true
@@ -1498,7 +1498,7 @@ solving:
       capacity_expansion_ucblock: false
       configfile: "config/smspp/TSSBlock/TSSBSCfg-IB-par-64.txt"
       pysmspp_options:
-        B: InnerBCfg-par.txt
+        B: "InnerBCfg-par.txt"
       stochastic_parameters:
         stochastic_type: tssb
         investment_outside: true

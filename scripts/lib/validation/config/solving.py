@@ -359,6 +359,7 @@ class SolvingConfig(BaseModel):
                 "random_seed": 123,
             },
             "gurobi-default": {
+                "MIPGap": 0.001,
                 "threads": 32,
                 "method": 2,
                 "crossover": 0,
@@ -368,7 +369,7 @@ class SolvingConfig(BaseModel):
                 "PreDual": 0,
                 "GURO_PAR_BARDENSETHRESH": 200,
                 "IISMethod": 1,
-                "TimeLimit": 86400,
+                "TimeLimit": 43200,
             },
             "gurobi-16": {
                 "MIPGap": 0.001,
@@ -456,7 +457,7 @@ class SolvingConfig(BaseModel):
             "glpk-default": {},
             "smspp-ucblock": {
                 "capacity_expansion_ucblock": True,
-                "configfile": "config/smspp/UCBlockGrb/uc_solverconfig.txt",
+                "configfile": "config/smspp/UCBlockGrb/uc_solverconfig-LP.txt",
             },
             "smspp-investmentblock": {
                 "capacity_expansion_ucblock": False,
@@ -465,7 +466,7 @@ class SolvingConfig(BaseModel):
             "smspp-unitcommitment-dispatch-ucblock": {
                 "capacity_expansion_ucblock": True,
                 "enable_thermal_units": True,
-                "configfile": "config/smspp/UCBlockGrb/uc_solverconfig.txt",
+                "configfile": "config/smspp/UCBlockGrb/uc_solverconfig-MILP.txt",
             },
             "smspp-unitcommitment-dispatch-investmentblock": {
                 "capacity_expansion_ucblock": False,
@@ -513,6 +514,7 @@ class SolvingConfig(BaseModel):
                 "configfile": "config/smspp/TSSBlock/TSSBSCfg-BDS.txt",
                 "pysmspp_options": {
                     "k": None,
+                    "v2": None,
                 },
                 "stochastic_parameters": {
                     "stochastic_type": "tssb",
@@ -524,6 +526,7 @@ class SolvingConfig(BaseModel):
                 "configfile": "config/smspp/TSSBlock/TSSBSCfg-BDS-CVX-pre.txt",
                 "pysmspp_options": {
                     "k": None,
+                    "v2": None,
                 },
                 "stochastic_parameters": {
                     "stochastic_type": "tssb",
@@ -613,6 +616,18 @@ class SolvingConfig(BaseModel):
             "smspp-tssb-ib": {
                 "capacity_expansion_ucblock": False,
                 "configfile": "config/smspp/TSSBlock/TSSBSCfg-IB.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg.txt",
+                },
+                "stochastic_parameters": {
+                    "stochastic_type": "tssb",
+                    "investment_outside": True,
+                    "parameters": ["demand", "renewable_maxpower"],
+                },
+            },
+            "smspp-tssb-ib-int": {
+                "capacity_expansion_ucblock": False,
+                "configfile": "config/smspp/TSSBlock/TSSBSCfg-IB-int.txt",
                 "pysmspp_options": {
                     "B": "InnerBCfg.txt",
                 },
