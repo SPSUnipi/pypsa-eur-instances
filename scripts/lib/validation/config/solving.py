@@ -471,6 +471,9 @@ class SolvingConfig(BaseModel):
                 "capacity_expansion_ucblock": False,
                 "enable_thermal_units": True,
                 "configfile": "config/smspp/InvestmentBlockGrb/BSPar.txt",
+                "pysmspp_options": {
+                    "B": "InnerBCfg-MIP.txt",
+                },
             },
             "smspp-unitcommitment-capacity-expansion": {
                 "capacity_expansion_ucblock": False,

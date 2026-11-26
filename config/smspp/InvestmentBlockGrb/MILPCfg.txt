@@ -1,0 +1,58 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - -  MILPCfg.txt  - - - - - - - - - - - - - - - -
+#
+# The ComputeConfig of the GRBMILPSolver of the inner UCBlock of an
+# InvestmentBlock [see BSCfg.txt]: the LP relaxation (intRelaxIntVars 1)
+# of the underlying MIP, whose dual values give the linearization of the
+# InvestmentFunction.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+ComputeConfig # exact type of the ComputeConfig object
+
+1  # f_diff == 0 ==> all non-provided parameters are set to the default value
+   # f_diff == 1 ==> all non-provided parameters are not changed
+
+3  # number of integer parameters
+
+# now all the integer parameters
+intLogVerb          0    # LogVerb, log verbosity of the MILPSolver
+intRelaxIntVars     1    # nonzero if the continuous relaxation is solved
+intCutSepPar        7    # separate user cuts + lazy constraints
+
+# All specific GUROBI parameter
+
+0  # number of double parameters
+
+# now all the double parameters
+# [none]
+
+0  # number of string parameters
+
+# now all the string parameters
+# [none]
+
+#strOutputFile uc_lp.lp
+
+0  # number of vector-of-int parameters
+
+# now all the vector-of-int parameters
+# [none]
+
+0  # number of vector-of-double parameters
+
+# now all the vector-of-double parameters
+# [none]
+
+0  # number of vector-of-string parameters
+
+# now all the vector-of-string parameters
+# [none]
+
+# pointer to the "extra" Configuration
+*  # [none]
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - -  END MILPCfg.txt  - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
