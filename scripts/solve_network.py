@@ -1916,6 +1916,11 @@ def create_optimization_model(
     n.config = config
     n.params = params
 
+    if _has_scenarios(n):
+        # 0 * inf is NaN and drops the lower bound of the load shedding
+        shed = n.generators.carrier == "load"
+        n.generators.loc[shed, "p_nom"] = n.generators.loc[shed, "p_nom"].clip(upper=1e6)
+
     logger.info("Creating optimization model...")
     n.optimize.create_model(**model_kwargs)
 
