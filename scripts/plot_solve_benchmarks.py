@@ -38,18 +38,15 @@ REQUIRED_COLUMNS = {
     "objective_constant",
 }
 OUTCOME_STYLES = {
+    "failed": {"marker": "X", "label": "Failed", "size": 100},
     "infeasible": {"marker": "P", "label": "Infeasible", "size": 100},
     "time_limit": {"marker": "X", "label": "Time limit", "size": 130},
 }
 SOLVED_POINT_SIZE = 75
 SMSPP_TIMING_STYLES = {
     "smspp_computational_s": {
-        "label": "SMS++ computational",
+        "label": "SMS++ compute time",
         "linestyle": "--",
-    },
-    "smspp_optimization_s": {
-        "label": "SMS++ subprocess",
-        "linestyle": ":",
     },
 }
 
@@ -143,6 +140,11 @@ def prepare_data(path: Path) -> pd.DataFrame:
     data["modeled_hours"] = data["periods"] * data["hours_per_period"]
     data["clusters"] = pd.to_numeric(data["clusters"], errors="coerce")
     data["runtime_s"] = pd.to_numeric(data["s"], errors="coerce")
+    # Snakemake reports max_rss in MiB; display peak resident memory in GiB.
+    data["memory_gib"] = pd.to_numeric(
+        data.get("max_rss", pd.Series(index=data.index, dtype=float)),
+        errors="coerce",
+    ) / 1024
     for column in SMSPP_TIMING_STYLES:
         data[column] = pd.to_numeric(
             data.get(column, pd.Series(index=data.index, dtype=float)),
@@ -173,6 +175,12 @@ def prepare_data(path: Path) -> pd.DataFrame:
     time_limited = outcome_text.str.contains(
         r"time[_ -]?limit|stopped for time", case=False, regex=True
     )
+    failed = (
+        data.get("benchmark_file", pd.Series("", index=data.index))
+        .fillna("")
+        .str.endswith(".failed")
+    )
+    data.loc[failed, "outcome"] = "failed"
     data.loc[time_limited, "outcome"] = "time_limit"
     missing_limits = time_limited & data["time_limit_s"].isna()
     if missing_limits.any():
@@ -210,7 +218,7 @@ def prepare_data(path: Path) -> pd.DataFrame:
     ]
     return (
         data.groupby(group_columns, as_index=False, dropna=False)[
-            ["runtime_s", *SMSPP_TIMING_STYLES, "objective"]
+            ["runtime_s", *SMSPP_TIMING_STYLES, "objective", "memory_gib"]
         ]
         .median()
         .sort_values(["periods", "hours_per_period", "clusters", "solver_options"])
@@ -240,7 +248,49 @@ def needs_log_scale(values: pd.Series, ratio_threshold: float = 20.0) -> bool:
 
 def solver_colors(solvers: list[str]) -> dict[str, object]:
     palette = plt.get_cmap("tab10")
-    return {solver: palette(index % 10) for index, solver in enumerate(solvers)}
+    fixed = {
+        "gurobi-default": "#1f77b4",
+        "smspp-tssb-ib-par": "#9467bd",
+        "smspp-tssb-bds": "#ff7f0e",
+        "gurobi-16": "#6baed6",
+        "gurobi-32": "#2171b5",
+        "gurobi-64": "#08306b",
+        "smspp-tssb-ib-16": "#bcbddc",
+        "smspp-tssb-ib-32": "#9467bd",
+        "smspp-tssb-ib-64": "#54278f",
+    }
+    return {solver: fixed.get(solver, palette(index % 10)) for index, solver in enumerate(solvers)}
+
+
+def solver_label(solver: str) -> str:
+    match = re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver)
+    if match:
+        family, threads = match.groups()
+        label = "PyPSA + Gurobi" if family == "gurobi" else "SMS++ InvestmentBlock\n+ Gurobi"
+        return f"{label}-{threads}"
+    return {
+        "gurobi-default": "PyPSA + Gurobi",
+        "smspp-tssb-ib-par": "SMS++ InvestmentBlock + Gurobi",
+        "smspp-tssb-bds": "SMS++ Benders + Gurobi",
+    }.get(solver, solver)
+
+
+def configure_plot_style() -> None:
+    """Share readable typography across benchmark plotting commands."""
+    plt.rcParams.update({
+        "font.family": "sans-serif",
+        "font.size": 15,
+        "axes.titlesize": 17,
+        "axes.labelsize": 15,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "legend.fontsize": 15,
+        "legend.title_fontsize": 15,
+        "figure.titlesize": 20,
+        "figure.facecolor": "white",
+        "axes.facecolor": "white",
+        "savefig.facecolor": "white",
+    })
 
 
 def style_axis(ax: plt.Axes, log_scale: bool) -> None:
@@ -271,14 +321,14 @@ def draw_series(
         if subset.empty:
             continue
         # A time-limit point is an isolated observation, not part of a trend line.
-        connected_y = subset[y].where(subset["outcome"] != "time_limit")
+        connected_y = subset[y].where(~subset["outcome"].isin(["time_limit", "failed"]))
         ax.plot(
             subset[x],
             connected_y,
             color=colors[solver],
             marker=None,
             linewidth=2,
-            label=solver,
+            label=solver_label(solver),
         )
         if y == "runtime_s":
             for timing_column, timing_style in SMSPP_TIMING_STYLES.items():
@@ -290,7 +340,7 @@ def draw_series(
                     timing_subset[timing_column],
                     color=colors[solver],
                     linestyle=timing_style["linestyle"],
-                    marker=None,
+                    marker="s",
                     linewidth=2,
                 )
         for outcome, outcome_subset in subset.groupby("outcome"):
@@ -307,6 +357,49 @@ def draw_series(
                 linewidth=1.1,
                 zorder=4,
             )
+        if y == "runtime_s":
+            for x_value, runtime in subset[[x, y]].dropna().itertuples(index=False, name=None):
+                if re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver):
+                    continue
+                if x == "scenarios" and x_value not in (10, 100, 200):
+                    continue
+                offset = {
+                    "gurobi-default": (0, 15),
+                    "smspp-tssb-ib-par": (0, -27),
+                    "smspp-tssb-bds": (0, 15),
+                }.get(solver, (0, 15))
+                thread_match = re.fullmatch(r"(gurobi|smspp-tssb-ib)-(16|32|64)", solver)
+                if thread_match:
+                    family, threads = thread_match.groups()
+                    peers = data.loc[
+                        (data[x] == x_value)
+                        & data["solver_options"].str.fullmatch(f"{family}-(16|32|64)")
+                    ].sort_values(y, ascending=family == "gurobi")
+                    rank = peers["solver_options"].tolist().index(solver)
+                    offset = (0, 15 + 23 * rank if family == "gurobi" else -27 - 23 * rank)
+                if x == "scenarios" and x_value >= 100:
+                    if solver == "gurobi-default":
+                        offset = (0, 15)
+                    elif solver == "smspp-tssb-bds":
+                        offset = (0, -27)
+                if runtime >= 3600:
+                    runtime_label = f"{runtime / 3600:.2f} h"
+                elif runtime >= 60:
+                    runtime_label = f"{runtime / 60:.1f} min"
+                else:
+                    runtime_label = f"{runtime:.1f} s"
+                ax.annotate(
+                    runtime_label,
+                    xy=(x_value, runtime),
+                    xytext=offset,
+                    textcoords="offset points",
+                    ha="center",
+                    color=colors[solver],
+                    fontsize=14,
+                    bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1),
+                    annotation_clip=False,
+                )
+            ax.margins(y=0.45 if any(re.fullmatch(r"gurobi-(16|32|64)", s) for s in solvers) else 0.25)
 
 
 def figure_legend(
@@ -314,14 +407,15 @@ def figure_legend(
     data: pd.DataFrame,
     solvers: list[str],
     colors: dict[str, object],
+    ncols: int = 3,
 ) -> None:
     handles = [
-        Line2D([], [], color=colors[s], marker="o", linewidth=2, label=s)
+        Line2D([], [], color=colors[s], marker="o", linewidth=2, label=solver_label(s))
         for s in solvers
     ]
     if any(data[column].notna().any() for column in SMSPP_TIMING_STYLES):
         handles.append(
-            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total")
+            Line2D([], [], color="#444444", linestyle="-", linewidth=2, label="Total time (benchmark)")
         )
         for column, style in SMSPP_TIMING_STYLES.items():
             if data[column].notna().any():
@@ -351,9 +445,9 @@ def figure_legend(
     figure.legend(
         handles=handles,
         loc="outside lower center",
-        ncols=min(len(handles), 4),
+        ncols=min(len(handles), ncols),
         frameon=False,
-        title="Solver options / timing / outcome",
+        title=None,
     )
 
 
@@ -400,7 +494,7 @@ def make_node_scaling_figure(
         ax.set_ylabel(y_label)
     for ax in axes.flat[len(resolutions) :]:
         ax.set_visible(False)
-    figure.suptitle(f"{heading or title}\nNetwork size", fontweight="bold", fontsize=15)
+    figure.suptitle(f"{heading or title}\nNetwork size", fontweight="bold")
     figure_legend(figure, data, solvers, colors)
     return figure
 
@@ -448,7 +542,7 @@ def make_time_scaling_figure(
         ax.set_ylabel(y_label)
     for ax in axes.flat[len(clusters) :]:
         ax.set_visible(False)
-    figure.suptitle(f"{heading or title}\nModeled time", fontweight="bold", fontsize=15)
+    figure.suptitle(f"{heading or title}\nModeled time", fontweight="bold")
     figure_legend(figure, data, solvers, colors)
     return figure
 
@@ -487,6 +581,24 @@ def plot_case(
             args.dpi,
         )
 
+    memory_data = data.loc[data["memory_gib"].notna() & (data["memory_gib"] > 0)].copy()
+    if memory_data.empty:
+        logger.warning("No positive max_rss values found; skipping memory plots.")
+    else:
+        # Timing lines are only relevant to the runtime figures.
+        memory_data[list(SMSPP_TIMING_STYLES)] = float("nan")
+        memory_solvers = sorted(memory_data["solver_options"].unique())
+        heading = f"Peak resident memory — {title_suffix}" if title_suffix else "Peak resident memory"
+        for dimension, make_figure in figures:
+            figure = make_figure(
+                memory_data, memory_solvers, colors, title, False,
+                y="memory_gib", y_label="Peak resident memory [GiB]", heading=heading,
+            )
+            save_figure(
+                figure, output_dir / f"benchmark_memory_{dimension}{stem_suffix}",
+                args.formats, args.dpi,
+            )
+
     valid_objective = data["objective"].notna() & (data["objective"] > 0)
     if not valid_objective.all():
         logger.warning(
@@ -495,6 +607,7 @@ def plot_case(
             f" for case variant {title_suffix}" if title_suffix else "",
         )
     objective_data = data.loc[valid_objective].copy()
+    objective_data[list(SMSPP_TIMING_STYLES)] = float("nan")
     if objective_data.empty:
         logger.warning("No numeric objective values found; skipping objective plots.")
         return
@@ -526,18 +639,7 @@ def main() -> None:
     output_dir = args.output_dir or args.input.parent / "plots"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    plt.rcParams.update(
-        {
-            "font.family": "sans-serif",
-            "font.size": 10,
-            "axes.titlesize": 11,
-            "axes.labelsize": 10,
-            "legend.fontsize": 9,
-            "figure.facecolor": "white",
-            "axes.facecolor": "white",
-            "savefig.facecolor": "white",
-        }
-    )
+    configure_plot_style()
     data = prepare_data(args.input)
     all_solvers = sorted(data["solver_options"].unique())
     colors = solver_colors(all_solvers)
